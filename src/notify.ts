@@ -1,8 +1,8 @@
+import { Construct } from "constructs";
 import * as Sfn from "aws-cdk-lib/aws-stepfunctions";
 import * as Sns from "aws-cdk-lib/aws-sns";
 import * as Subscriptions from "aws-cdk-lib/aws-sns-subscriptions";
 import * as Tasks from "aws-cdk-lib/aws-stepfunctions-tasks";
-import { Construct } from "constructs";
 
 export const createNotifications = (scope: Construct) => {
   const reservationFailed = new Sfn.Fail(scope, "Reservation failed", { error: "Job failed" });
@@ -21,13 +21,12 @@ export const createNotifications = (scope: Construct) => {
   const snsNotificationSuccess = new Tasks.SnsPublish(scope, "sendingSMSSuccess", {
     topic,
     integrationPattern: Sfn.IntegrationPattern.REQUEST_RESPONSE,
-    message: Sfn.TaskInput.fromText("Your Travel Reservation is sucecssful")
+    message: Sfn.TaskInput.fromText("Your Travel Reservation is successful")
   });
 
   return {
     reservationFailed,
     reservationSucceeded,
-    topic,
     snsNotificationFailure,
     snsNotificationSuccess
   };

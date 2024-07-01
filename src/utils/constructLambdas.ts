@@ -4,6 +4,13 @@ import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Construct } from "constructs";
 import { Table } from "aws-cdk-lib/aws-dynamodb";
 
+/**
+ * Utility method to create Lambda blueprint
+ * @param scope
+ * @param id
+ * @param handler
+ * @param table
+ */
 export const createLambda = (scope: Construct, id: string, handler: string, table: Table) => {
   const fn = new NodejsFunction(scope, id, {
     runtime: Lambda.Runtime.NODEJS_20_X,
