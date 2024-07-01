@@ -8,9 +8,11 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "watch": "tsc -w",
-    "cdk": "cdk",
-    "test": "jest"
+    "bootstrap": "cdk bootstrap",
+    "deploy-stack": "cdk deploy",
+    "synth": "cdk synth",
+    "test": "jest",
+    "watch": "tsc -w"
   },
   "keywords": [],
   "author": "",
