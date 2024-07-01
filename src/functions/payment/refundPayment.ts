@@ -1,8 +1,8 @@
 export const handler = async () => {
-  console.log("Reserving flights..");
+  console.log("Refunding payment..");
 
   return {
     status: "ok",
-    booking_id: "Flight reserved"
+    booking_id: "Payment refunded"
   } ;
 }

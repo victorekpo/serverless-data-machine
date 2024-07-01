@@ -4,3 +4,4 @@ dist/
 local.js
 .idea/
 package-lock.json
+cdk.out/
