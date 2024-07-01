@@ -14,7 +14,7 @@ import { Table } from "aws-cdk-lib/aws-dynamodb";
 export const createLambda = (scope: Construct, id: string, handler: string, table: Table) => {
   const fn = new NodejsFunction(scope, id, {
     runtime: Lambda.Runtime.NODEJS_20_X,
-    entry: join('functions', handler),
+    entry: join("src", "functions", handler),
     bundling: {
       externalModules: [
         'aws-sdk'
