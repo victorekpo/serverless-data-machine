@@ -1,16 +1,18 @@
-import * as cdk from 'aws-cdk-lib';
+import * as CDK from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { StateMachine } from './stateMachine';
 
-export class CdkServerlessSagaStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+export class CdkServerlessSagaStack extends CDK.Stack {
+  constructor(scope: Construct, id: string, props?: CDK.StackProps) {
     super(scope, id, props);
 
-    const stateMachine = new StateMachine(this, 'StateMachine');
+    console.log("New StateMachine")
+    new StateMachine(this, 'StateMachine');
   }
 }
 
-const app = new cdk.App();
+console.log("New app, CDK")
+const app = new CDK.App();
 new CdkServerlessSagaStack(app, 'CdkServerlessSagaStack', {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,

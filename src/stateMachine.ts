@@ -1,10 +1,11 @@
 import { Construct } from "constructs";
 import * as Sfn from "aws-cdk-lib/aws-stepfunctions";
+import * as Lambda from "aws-cdk-lib/aws-lambda";
 import * as Apigw from "aws-cdk-lib/aws-apigateway";
-import { createDynamoDBTables } from "./dynamodb";
-import { createLambdaFunctions } from "./lambda";
+import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { createNotifications } from "./notify";
-import { createLambda } from "./utils/constructLambdas";
+import { createReservationTasks } from "./reservationTasks";
+import { join } from "path";
 
 /**
  * Saga Pattern StepFunction
@@ -18,28 +19,56 @@ export class StateMachine extends Construct {
 
   constructor(scope: Construct, id: string) {
     super(scope, id);
-    // Create DynamoDB Tables
-    const tables = createDynamoDBTables(this);
-    const {
-      flightFns: {
-        reserveFlightLambda,
-        confirmFlightLambda,
-        cancelFlightLambda
-      },
-      carRentalFns: {
-        reserveRentalLambda,
-        confirmRentalLambda,
-        cancelRentalLambda
-      },
-      paymentFns: {
-        processPaymentLambda,
-        refundPaymentLambda
-      }
-    } = createLambdaFunctions(this, createLambda, tables);
 
     // Final States - Success or Failure, SNS Topic, and SNS Notifications
-    const { reservationFailed, reservationSucceeded, topic, snsNotificationFailure, snsNotificationSuccess } = createNotifications(this);
+    const notifications = createNotifications(this);
 
+    const {
+      reservationSucceeded,
+      snsNotificationSuccess
+    } = notifications;
+
+    // Create Reservation Step Function Tasks
+    const { reserveFlight, reserveCarRental, processPayment, confirmFlight, confirmCarRental } = createReservationTasks(this, notifications);
+
+    // Step Function definition, chain Tasks
+    const stepFunctionDefinition = Sfn.Chain
+      .start(reserveFlight)
+      .next(reserveCarRental)
+      .next(processPayment)
+      .next(confirmFlight)
+      .next(confirmCarRental)
+      .next(snsNotificationSuccess)
+      .next(reservationSucceeded);
+
+    const saga = new Sfn.StateMachine(this, "StateMachine", {
+      definitionBody: Sfn.DefinitionBody.fromChainable(stepFunctionDefinition)
+    });
+
+    // AWS Lambda resource to connect to our API Gateway to kick off our step function
+
+    const sagaLambda = new NodejsFunction(this, "sagaLambdaHandler", {
+      runtime: Lambda.Runtime.NODEJS_20_X,
+      entry: join("src", "functions", "sagaLambda.ts"),
+      bundling: {
+        externalModules: [
+          'aws-sdk'
+        ]
+      },
+      environment: {
+        statemachine_arn: saga.stateMachineArn
+      }
+    });
+
+    saga.grantStartExecution(sagaLambda);
+
+    /**
+     * Simple API Gateway proxy integration
+     */
+
+    new Apigw.LambdaRestApi(this, "ServerlessSagaPattern", {
+      handler: sagaLambda
+    });
     // End Constructor
   }
 }

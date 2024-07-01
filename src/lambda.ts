@@ -1,4 +1,3 @@
-import * as Lambda from "aws-cdk-lib/aws-lambda";
 import { Construct } from "constructs";
 import { Table } from "aws-cdk-lib/aws-dynamodb";
 
