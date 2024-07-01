@@ -10,6 +10,7 @@
     "build": "tsc",
     "bootstrap": "cdk bootstrap",
     "deploy-stack": "cdk deploy",
+    "destroy": "cdk destroy",
     "synth": "cdk synth",
     "test": "jest",
     "watch": "tsc -w"
