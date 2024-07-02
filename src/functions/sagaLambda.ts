@@ -16,7 +16,7 @@ export const handler = (event: any, context: any, callback: any) => {
     }
   }
 
-  let input = {
+  const input = {
     "trip_id": tripID,
     "depart_city": "Milwaukee",
     "depart_time": "2024-01-01T00:00:00.000Z",

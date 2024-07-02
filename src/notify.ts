@@ -10,15 +10,16 @@ export const createNotifications = (scope: Construct) => {
   const reservationSucceeded = new Sfn.Succeed(scope, "Reservation Successful!");
 
   const topic = new Sns.Topic(scope, "Topic");
-  topic.addSubscription(new Subscriptions.SmsSubscription("+12817146701"));
+  topic.addSubscription(new Subscriptions.EmailSubscription('victor.ekpo@gmail.com'));
 
-  const snsNotificationFailure = new Tasks.SnsPublish(scope, "sendingSMSFailure", {
+
+  const snsNotificationFailure = new Tasks.SnsPublish(scope, "sendingEmailFailure", {
     topic,
     integrationPattern: Sfn.IntegrationPattern.REQUEST_RESPONSE,
     message: Sfn.TaskInput.fromText("Your Travel Reservation Failed")
   });
 
-  const snsNotificationSuccess = new Tasks.SnsPublish(scope, "sendingSMSSuccess", {
+  const snsNotificationSuccess = new Tasks.SnsPublish(scope, "sendingEmailSuccess", {
     topic,
     integrationPattern: Sfn.IntegrationPattern.REQUEST_RESPONSE,
     message: Sfn.TaskInput.fromText("Your Travel Reservation is successful")
