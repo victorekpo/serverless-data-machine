@@ -9,7 +9,7 @@
   "scripts": {
     "build": "tsc",
     "bootstrap": "cdk bootstrap",
-    "deploy-stack": "cdk deploy",
+    "deploy": "cdk deploy",
     "destroy": "cdk destroy",
     "synth": "cdk synth",
     "test": "jest",
