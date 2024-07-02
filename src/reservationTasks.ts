@@ -98,7 +98,7 @@ export const createReservationTasks = (scope: Construct, notifications: any) => 
       resultPath: "$.ConfirmFlightError"
     });
 
-  const confirmCarRental = new Tasks.LambdaInvoke(scope, "ConfirmCarCental", {
+  const confirmCarRental = new Tasks.LambdaInvoke(scope, "ConfirmCarRental", {
     lambdaFunction: confirmRentalLambda,
     resultPath: "$.ConfirmCarRentalResult"
   })
