@@ -1,11 +1,11 @@
-import { Construct } from "constructs";
-import * as Sfn from "aws-cdk-lib/aws-stepfunctions";
-import * as Lambda from "aws-cdk-lib/aws-lambda";
-import * as Apigw from "aws-cdk-lib/aws-apigateway";
-import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
-import { createNotifications } from "./notify";
-import { createReservationTasks } from "./reservationTasks";
-import { join } from "path";
+import { Construct } from 'constructs';
+import * as Sfn from 'aws-cdk-lib/aws-stepfunctions';
+import * as Lambda from 'aws-cdk-lib/aws-lambda';
+import * as Apigw from 'aws-cdk-lib/aws-apigateway';
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { createNotifications } from './notify';
+import { createReservationTasks } from './reservationTasks';
+import { join } from 'path';
 
 /**
  * Saga Pattern StepFunction
@@ -41,15 +41,15 @@ export class StateMachine extends Construct {
       .next(snsNotificationSuccess)
       .next(reservationSucceeded);
 
-    const saga = new Sfn.StateMachine(this, "StateMachine", {
+    const saga = new Sfn.StateMachine(this, 'StateMachine', {
       definitionBody: Sfn.DefinitionBody.fromChainable(stepFunctionDefinition)
     });
 
     // AWS Lambda resource to connect to our API Gateway to kick off our step function
 
-    const sagaLambda = new NodejsFunction(this, "sagaLambdaHandler", {
+    const sagaLambda = new NodejsFunction(this, 'sagaLambdaHandler', {
       runtime: Lambda.Runtime.NODEJS_20_X,
-      entry: join("src", "functions", "sagaLambda.ts"),
+      entry: join('src', 'functions', 'sagaLambda.ts'),
       bundling: {
         externalModules: [
           'aws-sdk'
@@ -66,7 +66,7 @@ export class StateMachine extends Construct {
      * Simple API Gateway proxy integration
      */
 
-    new Apigw.LambdaRestApi(this, "ServerlessSagaPattern", {
+    new Apigw.LambdaRestApi(this, 'ServerlessSagaPattern', {
       handler: sagaLambda
     });
     // End Constructor

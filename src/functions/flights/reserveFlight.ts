@@ -1,6 +1,6 @@
 import { v4 } from 'uuid';
-import { DynamoDB } from "aws-sdk";
-import { PutItemInput } from "aws-sdk/clients/dynamodb";
+import { DynamoDB } from 'aws-sdk';
+import { PutItemInput } from 'aws-sdk/clients/dynamodb';
 
 interface ReserveRentalEvent {
   requestId: string;
@@ -20,8 +20,8 @@ export const handler = async (event: ReserveRentalEvent) => {
   console.log(`flightReservationId: ${flightReservationId}`);
 
   // Pass the parameter to fail this step
-  if (event.runType === "failFlightsReservation") {
-    throw new Error("Failed to book the flights");
+  if (event.runType === 'failFlightsReservation') {
+    throw new Error('Failed to book the flights');
   }
 
   // create AWS SDK clients
@@ -46,14 +46,14 @@ export const handler = async (event: ReserveRentalEvent) => {
     .putItem(params)
     .promise()
     .catch(error => {
-      console.error("Error", error);
+      console.error('Error', error);
       throw new Error(error);
     });
 
   console.log(`Reserve flight result: ${JSON.stringify(result)}`);
 
   return {
-    status: "ok",
+    status: 'ok',
     flightReservationId
   };
 };

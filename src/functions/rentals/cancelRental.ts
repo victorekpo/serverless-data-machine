@@ -1,8 +1,8 @@
 export const handler = async () => {
-  console.log("Canceling rentals..");
+  console.log('Canceling rentals..');
 
   return {
-    status: "ok",
-    booking_id: "Rental canceled"
+    status: 'ok',
+    booking_id: 'Rental canceled'
   } ;
-}
+};

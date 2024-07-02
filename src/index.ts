@@ -6,12 +6,12 @@ export class CdkServerlessSagaStack extends CDK.Stack {
   constructor(scope: Construct, id: string, props?: CDK.StackProps) {
     super(scope, id, props);
 
-    console.log("New StateMachine")
+    console.log('New StateMachine');
     new StateMachine(this, 'StateMachine');
   }
 }
 
-console.log("New app, CDK")
+console.log('New app, CDK');
 const app = new CDK.App();
 new CdkServerlessSagaStack(app, 'CdkServerlessSagaStack', {
   /* If you don't specify 'env', this stack will be environment-agnostic.

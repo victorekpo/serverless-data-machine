@@ -11,8 +11,8 @@
     "bootstrap": "cdk bootstrap",
     "deploy": "cdk deploy",
     "destroy": "cdk destroy",
-    "lint": "eslint",
-    "lint-fix": "eslint --fix",
+    "lint": "eslint **/*.ts",
+    "lint-fix": "eslint **/*.ts --fix",
     "synth": "cdk synth",
     "test": "jest",
     "watch": "tsc -w"

@@ -1,4 +1,4 @@
-import { SagaLambdaEvent } from "../functions/sagaLambda";
+import { SagaLambdaEvent } from '../functions/sagaLambda';
 
 type SagaLambdaInputs = SagaLambdaEvent['queryStringParameters'];
 

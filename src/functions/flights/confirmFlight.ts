@@ -1,5 +1,5 @@
 import { DynamoDB } from 'aws-sdk';
-import { UpdateItemInput } from "aws-sdk/clients/dynamodb";
+import { UpdateItemInput } from 'aws-sdk/clients/dynamodb';
 
 interface ConfirmFlightEvent {
   runType: string;
@@ -13,30 +13,30 @@ interface ConfirmFlightEvent {
 
 export const handler = async (event: ConfirmFlightEvent) => {
   const { requestId, runType, ReserveFlightResult} = event;
-  
+
   console.log(`Confirming flights: ${JSON.stringify(event, null, 2)}`);
-  
+
   if (runType !== 'failFlightsConfirmation') {
     throw new Error('Failed to book the flights');
   }
-  
+
   if (!ReserveFlightResult) {
     throw new Error('No result found for confirming flight');
   }
-  
+
   const { flightReservationId } = ReserveFlightResult.Payload;
-  
+
   const dynamoDB = new DynamoDB();
-  
+
   const params: UpdateItemInput = {
     TableName: <string>process.env.TABLE_NAME,
     Key: {
       'pk': { S: requestId },
       'sk': { S: flightReservationId }
     },
-    UpdateExpression: "set transaction_status = :booked",
+    UpdateExpression: 'set transaction_status = :booked',
     ExpressionAttributeValues: {
-      ":booked": { S: "confirmed" }
+      ':booked': { S: 'confirmed' }
     }
   };
 
@@ -49,9 +49,9 @@ export const handler = async (event: ConfirmFlightEvent) => {
     });
 
   console.log(`Confirmed flight reservation: ${JSON.stringify(result)}`);
-  
+
   return {
-    status: "ok",
+    status: 'ok',
     flightReservationId
   };
 };
