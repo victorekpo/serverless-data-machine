@@ -5,7 +5,7 @@ import { createLambda } from "./utils/constructLambdas";
 import { createDynamoDBTables } from "./dynamodb";
 
 export const createReservationTasks = (scope: Construct, notifications: any) => {
-  const { reservationFailed, reservationSucceeded, snsNotificationFailure, snsNotificationSuccess } = notifications;
+  const { reservationFailed, snsNotificationFailure } = notifications;
 
   // Create DynamoDB Tables
   const tables = createDynamoDBTables(scope);

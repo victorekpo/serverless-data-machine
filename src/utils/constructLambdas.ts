@@ -12,7 +12,6 @@ import { Table } from "aws-cdk-lib/aws-dynamodb";
  * @param table
  */
 export const createLambda = (scope: Construct, id: string, handler: string, table: Table) => {
-  console.log("lambda 1")
   const fn = new NodejsFunction(scope, id, {
     runtime: Lambda.Runtime.NODEJS_20_X,
     entry: join("src", "functions", handler),
@@ -25,7 +24,7 @@ export const createLambda = (scope: Construct, id: string, handler: string, tabl
       }
     }
   });
-  console.log("lambda 2")
+
   // Give Lambda permissions to read and write data from the DynamoDB table
   table.grantReadWriteData(fn);
 

@@ -1,6 +1,20 @@
 module.exports = {
+  parser: '@typescript-eslint/parser',
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended'
+  ],
+  parserOptions: {
+    ecmaVersion: 2020,
+    sourceType: 'module'
+  },
+  env: {
+    es6: true,
+    node: true,
+    browser: true
+  },
   // Ignore files within the node_modules directory
-  ignores: ['node_modules/**'],
+  ignorePatterns: ['node_modules/**', 'cdk.out/**'],
   rules: {
     'no-duplicate-case': 'error',
     'no-empty': 'error',
@@ -25,5 +39,9 @@ module.exports = {
     quotes: ['error', 'single'],
     semi: ['error', 'always'],
     radix: 'off',
-  },
+    // TypeScript specific rules
+    '@typescript-eslint/no-unused-vars': 'error',
+    '@typescript-eslint/no-use-before-define': 'error',
+    '@typescript-eslint/no-redeclare': 'error'
+  }
 };
