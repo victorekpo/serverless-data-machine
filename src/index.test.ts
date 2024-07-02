@@ -9,7 +9,7 @@ describe("CDK Stack", () => {
     const app = new CDK.App();
     const stack = new CdkServerlessSagaStack(app, "MyTestStack");
     template = Template.fromStack(stack);
-    console.log("Template", template);
+    console.log("Template", JSON.stringify(template, null, 2));
   });
 
   test("API Gateway Proxy Created", () => {
