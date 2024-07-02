@@ -1,10 +1,10 @@
 import { Construct } from 'constructs';
 import * as Tasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
-import { createLambdaFunctions } from './lambda';
-import { createLambda } from './utils/constructLambdas';
+import { createLambda, createLambdaFunctions } from './lambda';
 import { createDynamoDBTables } from './dynamodb';
+import { LayerVersion } from "aws-cdk-lib/aws-lambda";
 
-export const createReservationTasks = (scope: Construct, notifications: any) => {
+export const createReservationTasks = (scope: Construct, notifications: any, layers: LayerVersion[]) => {
   const { reservationFailed, snsNotificationFailure } = notifications;
 
   // Create DynamoDB Tables
@@ -26,7 +26,7 @@ export const createReservationTasks = (scope: Construct, notifications: any) => 
       processPaymentLambda,
       refundPaymentLambda
     }
-  } = createLambdaFunctions(scope, createLambda, tables);
+  } = createLambdaFunctions(scope, createLambda, tables, layers);
 
   /**
    * Reserve Flights

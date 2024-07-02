@@ -1,13 +1,27 @@
 import * as CDK from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { StateMachine } from './stateMachine';
+import * as Lambda from "aws-cdk-lib/aws-lambda";
 
 export class CdkServerlessSagaStack extends CDK.Stack {
   constructor(scope: Construct, id: string, props?: CDK.StackProps) {
     super(scope, id, props);
 
     console.log('New StateMachine');
-    new StateMachine(this, 'StateMachine');
+
+    // Layers
+    const uuidLayer = new Lambda.LayerVersion(this, 'UuidLayer', {
+      code: Lambda.Code.fromAsset('src/layers/uuid'),
+      compatibleRuntimes: [Lambda.Runtime.NODEJS_20_X],
+      description: 'A layer for uuid library',
+    });
+
+    const layers = [
+      uuidLayer
+    ];
+
+    // instantiate State Machine
+    new StateMachine(this, 'StateMachine', layers);
   }
 }
 

@@ -6,6 +6,7 @@ import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { createNotifications } from './notify';
 import { createReservationTasks } from './reservationTasks';
 import { join } from 'path';
+import { LayerVersion } from "aws-cdk-lib/aws-lambda";
 
 /**
  * Saga Pattern StepFunction
@@ -17,7 +18,7 @@ import { join } from 'path';
 export class StateMachine extends Construct {
   public Machine: Sfn.StateMachine;
 
-  constructor(scope: Construct, id: string) {
+  constructor(scope: Construct, id: string, layers: LayerVersion[]) {
     super(scope, id);
 
     // Final States - Success or Failure, SNS Topic, and SNS Notifications
@@ -29,7 +30,7 @@ export class StateMachine extends Construct {
     } = notifications;
 
     // Create Reservation Step Function Tasks
-    const { reserveFlight, reserveCarRental, processPayment, confirmFlight, confirmCarRental } = createReservationTasks(this, notifications);
+    const { reserveFlight, reserveCarRental, processPayment, confirmFlight, confirmCarRental } = createReservationTasks(this, notifications, layers);
 
     // Step Function definition, chain Tasks
     const stepFunctionDefinition = Sfn.Chain
