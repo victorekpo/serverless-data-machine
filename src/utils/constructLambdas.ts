@@ -16,9 +16,6 @@ export const createLambda = (scope: Construct, id: string, handler: string, tabl
     runtime: Lambda.Runtime.NODEJS_20_X,
     entry: join('src', 'functions', handler),
     bundling: {
-      externalModules: [
-        'aws-sdk'
-      ],
       environment: {
         TABLE_NAME: table.tableName
       }

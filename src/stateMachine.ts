@@ -50,11 +50,6 @@ export class StateMachine extends Construct {
     const sagaLambda = new NodejsFunction(this, 'sagaLambdaHandler', {
       runtime: Lambda.Runtime.NODEJS_20_X,
       entry: join('src', 'functions', 'sagaLambda.ts'),
-      bundling: {
-        externalModules: [
-          'aws-sdk'
-        ]
-      },
       environment: {
         statemachine_arn: saga.stateMachineArn
       }
