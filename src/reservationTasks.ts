@@ -1,11 +1,11 @@
-import { Construct } from "constructs";
-import * as Tasks from "aws-cdk-lib/aws-stepfunctions-tasks";
-import { createLambdaFunctions } from "./lambda";
-import { createLambda } from "./utils/constructLambdas";
-import { createDynamoDBTables } from "./dynamodb";
+import { Construct } from 'constructs';
+import * as Tasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
+import { createLambda, createLambdaFunctions } from './lambda';
+import { createDynamoDBTables } from './dynamodb';
+import { LayerVersion } from "aws-cdk-lib/aws-lambda";
 
-export const createReservationTasks = (scope: Construct, notifications: any) => {
-  const { reservationFailed, reservationSucceeded, snsNotificationFailure, snsNotificationSuccess } = notifications;
+export const createReservationTasks = (scope: Construct, notifications: any, layers: LayerVersion[]) => {
+  const { reservationFailed, snsNotificationFailure } = notifications;
 
   // Create DynamoDB Tables
   const tables = createDynamoDBTables(scope);
@@ -26,85 +26,85 @@ export const createReservationTasks = (scope: Construct, notifications: any) => 
       processPaymentLambda,
       refundPaymentLambda
     }
-  } = createLambdaFunctions(scope, createLambda, tables);
+  } = createLambdaFunctions(scope, createLambda, tables, layers);
 
   /**
    * Reserve Flights
    */
 
-  const cancelFlightReservation = new Tasks.LambdaInvoke(scope, "CancelFlightReservation", {
+  const cancelFlightReservation = new Tasks.LambdaInvoke(scope, 'CancelFlightReservation', {
     lambdaFunction: cancelFlightLambda,
-    resultPath: "$.CancelFlightReservationResult",
+    resultPath: '$.CancelFlightReservationResult',
   })
     .addRetry({ maxAttempts: 3 })
     .next(snsNotificationFailure)
     .next(reservationFailed);
 
-  const reserveFlight = new Tasks.LambdaInvoke(scope, "ReserveFlight", {
+  const reserveFlight = new Tasks.LambdaInvoke(scope, 'ReserveFlight', {
     lambdaFunction: reserveFlightLambda,
-    resultPath: "$.ReserveFlightResult",
+    resultPath: '$.ReserveFlightResult',
   })
     .addCatch(cancelFlightReservation, {
-      resultPath: "$.ReserveFlightError"
+      resultPath: '$.ReserveFlightError'
     });
 
   /**
    * Reserve Car Rentals
    */
 
-  const cancelRentalReservation = new Tasks.LambdaInvoke(scope, "CancelRentalReservation", {
+  const cancelRentalReservation = new Tasks.LambdaInvoke(scope, 'CancelRentalReservation', {
     lambdaFunction: cancelRentalLambda,
-    resultPath: "$.CancelRentalReservationResult"
+    resultPath: '$.CancelRentalReservationResult'
   })
     .addRetry({ maxAttempts: 3 })
     .next(cancelFlightReservation);
 
-  const reserveCarRental = new Tasks.LambdaInvoke(scope, "ReserveCarRental", {
+  const reserveCarRental = new Tasks.LambdaInvoke(scope, 'ReserveCarRental', {
     lambdaFunction: reserveRentalLambda,
-    resultPath: "$.ReserveCarRentalResult"
+    resultPath: '$.ReserveCarRentalResult'
   })
     .addCatch(cancelRentalReservation, {
-      resultPath: "$.ReserveCarRentalError"
+      resultPath: '$.ReserveCarRentalError'
     });
 
   /**
    * Payment
    */
 
-  const refundPayment = new Tasks.LambdaInvoke(scope, "RefundPayment", {
+  const refundPayment = new Tasks.LambdaInvoke(scope, 'RefundPayment', {
     lambdaFunction: refundPaymentLambda,
-    resultPath: "$.RefundPaymentResult"
+    resultPath: '$.RefundPaymentResult'
   })
     .addRetry({ maxAttempts: 3 })
     .next(cancelRentalReservation);
 
-  const processPayment = new Tasks.LambdaInvoke(scope, "ProcessPayment", {
+  const processPayment = new Tasks.LambdaInvoke(scope, 'ProcessPayment', {
     lambdaFunction: processPaymentLambda,
-    resultPath: "$.ProcessPaymentResult"
+    resultPath: '$.ProcessPaymentResult'
   })
     .addCatch(refundPayment, {
-      resultPath: "$.ProcessPaymentError"
+      resultPath: '$.ProcessPaymentError'
     });
 
   /**
    * Confirm Flight and Car Rental reservation
    */
 
-  const confirmFlight = new Tasks.LambdaInvoke(scope, "ConfirmFlight", {
+  const confirmFlight = new Tasks.LambdaInvoke(scope, 'ConfirmFlight', {
     lambdaFunction: confirmFlightLambda,
-    resultPath: "$.ConfirmFlightResult"
+    resultPath: '$.ConfirmFlightResult'
   })
     .addCatch(refundPayment, {
-      resultPath: "$.ConfirmFlightError"
+      resultPath: '$.ConfirmFlightError'
     });
 
-  const confirmCarRental = new Tasks.LambdaInvoke(scope, "ConfirmCarCental", {
+  const confirmCarRental = new Tasks.LambdaInvoke(scope, 'ConfirmCarRental', {
     lambdaFunction: confirmRentalLambda,
-    resultPath: "$.ConfirmCarRentalResult"
+    resultPath: '$.ConfirmCarRentalResult'
   })
     .addCatch(refundPayment, {
-    resultPath: "$.ConfirmCarRentalError"
-  });
+      resultPath: '$.ConfirmCarRentalError'
+    });
 
   return {
     reserveFlight,

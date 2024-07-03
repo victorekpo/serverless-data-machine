@@ -1,17 +1,39 @@
 import * as CDK from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { StateMachine } from './stateMachine';
+import * as Lambda from "aws-cdk-lib/aws-lambda";
 
 export class CdkServerlessSagaStack extends CDK.Stack {
   constructor(scope: Construct, id: string, props?: CDK.StackProps) {
     super(scope, id, props);
 
-    console.log("New StateMachine")
-    new StateMachine(this, 'StateMachine');
+    console.log('New StateMachine');
+
+    // Layers
+    const awsSdkLayer = new Lambda.LayerVersion(this, 'AWSdkLayer', {
+      code: Lambda.Code.fromAsset('src/layers/aws-sdk'),
+      compatibleRuntimes: [Lambda.Runtime.NODEJS_20_X],
+      description: 'A layer for aws-sdk library',
+    });
+
+    const uuidLayer = new Lambda.LayerVersion(this, 'UuidLayer', {
+      code: Lambda.Code.fromAsset('src/layers/uuid'),
+      compatibleRuntimes: [Lambda.Runtime.NODEJS_20_X],
+      description: 'A layer for uuid library',
+    });
+
+
+    const layers = [
+      awsSdkLayer,
+      uuidLayer
+    ];
+
+    // instantiate State Machine
+    new StateMachine(this, 'StateMachine', layers);
   }
 }
 
-console.log("New app, CDK")
+console.log('New app, CDK');
 const app = new CDK.App();
 new CdkServerlessSagaStack(app, 'CdkServerlessSagaStack', {
   /* If you don't specify 'env', this stack will be environment-agnostic.

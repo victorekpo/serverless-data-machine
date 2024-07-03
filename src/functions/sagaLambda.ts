@@ -1,36 +1,38 @@
-import { StepFunctions } from "aws-sdk";
+import { StepFunctions } from 'aws-sdk';
+import { validateInputs } from '../utils/validateInputs';
+import { v4 } from 'uuid';
+
+export interface SagaLambdaEvent {
+  queryStringParameters: {
+    departCity?: string;
+    departTime?: string;
+    arriveCity?: string;
+    arriveTime?: string;
+    rental?: string;
+    rentalFrom?: string;
+    rentalTo?: string;
+    requestId?: string;
+    runType?: string;
+  }
+}
 
 const stepFunctions = new StepFunctions({});
 
-export const handler = (event: any, context: any, callback: any) => {
-  let runType = "success";
-  let tripID = context.awsRequestId;
+export const handler = (event: SagaLambdaEvent, context: any, callback: any) => {
+  const { queryStringParameters } = event;
 
-  if (null != event.queryStringParameters) {
-    if (typeof event.queryStringParameters.runType != 'undefined') {
-      runType = event.queryStringParameters.runType;
-    }
+  const runType = queryStringParameters?.runType || 'success';
+  const requestId = queryStringParameters?.requestId || context.awsRequestId || v4();
 
-    if (typeof event.queryStringParameters.tripID != 'undefined') {
-      tripID = event.queryStringParameters.tripID;
-    }
+  if (!queryStringParameters) {
+    throw new Error('No input parameters found');
   }
 
-  const input = {
-    "trip_id": tripID,
-    "depart_city": "Milwaukee",
-    "depart_time": "2024-01-01T00:00:00.000Z",
-    "arrive_city": "Abuja",
-    "arrive_time": "2024-01-03T00:00:00.000Z",
-    "rental": "BMW X7",
-    "rental_from": "2024-01-03T00:00:00.000Z",
-    "rental_to": "2024-01-10T00:00:00.000Z",
-    "run_type": runType
-  };
+  const inputs = validateInputs(queryStringParameters, requestId, runType);
 
   const params = {
     stateMachineArn: <string>process.env.statemachine_arn,
-    input: JSON.stringify(input)
+    input: JSON.stringify(inputs)
   };
 
   stepFunctions.startExecution(params, (err: any, data: any) => {
@@ -39,7 +41,7 @@ export const handler = (event: any, context: any, callback: any) => {
       const response = {
         statusCode: 500,
         body: JSON.stringify({
-          message: "There was an error processing your reservation"
+          message: 'There was an error processing your reservation'
         })
       };
       callback(null, response);
@@ -48,7 +50,7 @@ export const handler = (event: any, context: any, callback: any) => {
       const response = {
         statusCode: 200,
         body: JSON.stringify({
-          message: "Your reservation is being processed"
+          message: 'Your reservation is being processed'
         })
       };
       callback(null, response);
