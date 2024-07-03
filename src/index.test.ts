@@ -1,13 +1,13 @@
 import { Template } from 'aws-cdk-lib/assertions';
 import * as CDK from 'aws-cdk-lib';
-import { CdkServerlessSagaStack } from './index';
+import { SagaStack } from './index';
 
 let template: Template;
 
 describe('CDK Stack', () => {
   beforeAll(() => {
     const app = new CDK.App();
-    const stack = new CdkServerlessSagaStack(app, 'MyTestStack');
+    const stack = new SagaStack(app, 'MyTestStack');
     template = Template.fromStack(stack);
     console.log('Template', JSON.stringify(template, null, 2));
   });

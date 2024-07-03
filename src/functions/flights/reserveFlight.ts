@@ -12,7 +12,7 @@ interface ReserveRentalEvent {
 }
 
 export const handler = async (event: ReserveRentalEvent) => {
-  const { requestId, departCity, departTime, arriveCity, arriveTime } = event;
+  const { requestId, runType, departCity, departTime, arriveCity, arriveTime } = event;
 
   console.log(`Reserving rentals request: ${JSON.stringify(event, null, 2)}`, process.env.TABLE_NAME);
 
@@ -20,7 +20,7 @@ export const handler = async (event: ReserveRentalEvent) => {
   console.log(`flightReservationId: ${flightReservationId}`);
 
   // Pass the parameter to fail this step
-  if (event.runType === 'failFlightsReservation') {
+  if (runType === 'failFlightsReservation') {
     throw new Error('Failed to book the flights');
   }
 

@@ -58,7 +58,7 @@ export const createLambdaFunctions = (scope: Construct, createFn: any, tables: R
  */
 
 export const createLambda = (scope: Construct, id: string, handler: string, table: Table, layers?: LayerVersion[] | undefined) => {
-  console.log("Table", table.tableName)
+  console.log("TableLambda: ", table.tableName)
   const fn = new NodejsFunction(scope, id, {
     runtime: Lambda.Runtime.NODEJS_20_X,
     entry: join('src', 'functions', handler),

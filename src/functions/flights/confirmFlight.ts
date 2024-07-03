@@ -16,7 +16,7 @@ export const handler = async (event: ConfirmFlightEvent) => {
 
   console.log(`Confirming flights: ${JSON.stringify(event, null, 2)}`, process.env.TABLE_NAME);
 
-  if (runType !== 'failFlightsConfirmation') {
+  if (runType === 'failFlightsConfirmation') {
     throw new Error('Failed to book the flights');
   }
 
