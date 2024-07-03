@@ -34,6 +34,7 @@ export const handler = (event: SagaLambdaEvent, context: any, callback: any) => 
     stateMachineArn: <string>process.env.statemachine_arn,
     input: JSON.stringify(inputs)
   };
+  console.log("statemachine_arn", process.env.statemachine_arn);
 
   stepFunctions.startExecution(params, (err: any, data: any) => {
     if (err) {

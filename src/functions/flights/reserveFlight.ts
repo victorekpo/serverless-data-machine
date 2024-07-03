@@ -12,23 +12,24 @@ interface ReserveRentalEvent {
 }
 
 export const handler = async (event: ReserveRentalEvent) => {
-  const { requestId, departCity, departTime, arriveCity, arriveTime } = event;
+  const { requestId, runType, departCity, departTime, arriveCity, arriveTime } = event;
 
-  console.log(`Reserving rentals request: ${JSON.stringify(event, null, 2)}`);
+  console.log(`Reserving rentals request: ${JSON.stringify(event, null, 2)}`, process.env.TABLE_NAME);
 
   const flightReservationId = v4();
   console.log(`flightReservationId: ${flightReservationId}`);
 
   // Pass the parameter to fail this step
-  if (event.runType === 'failFlightsReservation') {
+  if (runType === 'failFlightsReservation') {
     throw new Error('Failed to book the flights');
   }
 
   // create AWS SDK clients
   const dynamoDB = new DynamoDB();
-  console.log("Getting ready to insert into dynamodb")
+
+  console.log(`Getting ready to insert item in dynamodb, tripId: ${flightReservationId}; requestId: ${requestId}`);
   const params: PutItemInput = {
-    TableName: <string>process.env.TABLE_NAME || 'Flight',
+    TableName: <string>process.env.TABLE_NAME || 'Flights',
     Item: {
       'pk': { S: requestId },
       'sk' : { S: flightReservationId },
@@ -41,7 +42,7 @@ export const handler = async (event: ReserveRentalEvent) => {
       'transaction_status': { S: 'pending' }
     }
   };
-  console.log("Params inserted", params);
+  console.log("Params used", params);
   const result = await dynamoDB
     .putItem(params)
     .promise()

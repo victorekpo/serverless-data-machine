@@ -3,11 +3,9 @@ import { Construct } from 'constructs';
 import { StateMachine } from './stateMachine';
 import * as Lambda from "aws-cdk-lib/aws-lambda";
 
-export class CdkServerlessSagaStack extends CDK.Stack {
+export class SagaStack extends CDK.Stack {
   constructor(scope: Construct, id: string, props?: CDK.StackProps) {
     super(scope, id, props);
-
-    console.log('New StateMachine');
 
     // Layers
     const awsSdkLayer = new Lambda.LayerVersion(this, 'AWSdkLayer', {
@@ -29,13 +27,14 @@ export class CdkServerlessSagaStack extends CDK.Stack {
     ];
 
     // instantiate State Machine
+    console.log('New StateMachine');
     new StateMachine(this, 'StateMachine', layers);
   }
 }
 
-console.log('New app, CDK');
 const app = new CDK.App();
-new CdkServerlessSagaStack(app, 'CdkServerlessSagaStack', {
+console.log('New SagaStack');
+new SagaStack(app, 'SagaStack-Demo', {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */

@@ -14,9 +14,9 @@ interface ConfirmFlightEvent {
 export const handler = async (event: ConfirmFlightEvent) => {
   const { requestId, runType, ReserveFlightResult} = event;
 
-  console.log(`Confirming flights: ${JSON.stringify(event, null, 2)}`);
+  console.log(`Confirming flights: ${JSON.stringify(event, null, 2)}`, process.env.TABLE_NAME);
 
-  if (runType !== 'failFlightsConfirmation') {
+  if (runType === 'failFlightsConfirmation') {
     throw new Error('Failed to book the flights');
   }
 
@@ -28,8 +28,9 @@ export const handler = async (event: ConfirmFlightEvent) => {
 
   const dynamoDB = new DynamoDB();
 
+  console.log(`Getting ready to update item in dynamodb, tripId: ${flightReservationId}; requestId: ${requestId}`);
   const params: UpdateItemInput = {
-    TableName: <string>process.env.TABLE_NAME,
+    TableName: <string>process.env.TABLE_NAME || 'Flights',
     Key: {
       'pk': { S: requestId },
       'sk': { S: flightReservationId }
@@ -39,6 +40,7 @@ export const handler = async (event: ConfirmFlightEvent) => {
       ':booked': { S: 'confirmed' }
     }
   };
+  console.log("Params used", params);
 
   // Call DynamoDB to add the item to the table
   const result = await dynamoDB

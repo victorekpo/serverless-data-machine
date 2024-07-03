@@ -7,6 +7,7 @@ export const createDynamoDBTables = (scope: Construct) => {
    * Create Dynamo DB tables which holds flights and car rentals reservations as well as payments information
    */
   const flightTable = new Dynamodb.Table(scope, 'Flights', {
+    tableName: 'Flights',
     partitionKey: {
       name: 'pk',
       type: Dynamodb.AttributeType.STRING
@@ -20,6 +21,7 @@ export const createDynamoDBTables = (scope: Construct) => {
 
 
   const rentalTable = new Dynamodb.Table(scope, 'Rentals', {
+    tableName: 'Rentals',
     partitionKey: {
       name: 'pk',
       type: Dynamodb.AttributeType.STRING
@@ -32,6 +34,7 @@ export const createDynamoDBTables = (scope: Construct) => {
   });
 
   const paymentTable = new Dynamodb.Table(scope, 'Payments', {
+    tableName: 'Payments',
     partitionKey: {
       name: 'pk',
       type: Dynamodb.AttributeType.STRING

@@ -53,7 +53,8 @@ export class StateMachine extends Construct {
       entry: join('src', 'functions', 'sagaLambda.ts'),
       environment: {
         statemachine_arn: saga.stateMachineArn
-      }
+      },
+      ...(layers && { layers })
     });
 
     saga.grantStartExecution(sagaLambda);
