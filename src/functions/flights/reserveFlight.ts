@@ -14,7 +14,7 @@ interface ReserveRentalEvent {
 export const handler = async (event: ReserveRentalEvent) => {
   const { requestId, departCity, departTime, arriveCity, arriveTime } = event;
 
-  console.log(`Reserving rentals request: ${JSON.stringify(event, null, 2)}`);
+  console.log(`Reserving rentals request: ${JSON.stringify(event, null, 2)}`, process.env.TABLE_NAME);
 
   const flightReservationId = v4();
   console.log(`flightReservationId: ${flightReservationId}`);
@@ -29,7 +29,7 @@ export const handler = async (event: ReserveRentalEvent) => {
 
   console.log(`Getting ready to insert item in dynamodb, tripId: ${flightReservationId}; requestId: ${requestId}`);
   const params: PutItemInput = {
-    TableName: <string>process.env.TABLE_NAME || 'Flight',
+    TableName: <string>process.env.TABLE_NAME || 'Flights',
     Item: {
       'pk': { S: requestId },
       'sk' : { S: flightReservationId },
