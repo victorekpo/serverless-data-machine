@@ -28,6 +28,7 @@ export const handler = async (event: ConfirmFlightEvent) => {
 
   const dynamoDB = new DynamoDB();
 
+  console.log(`Getting ready to update item in dynamodb, tripId: ${flightReservationId}; requestId: ${requestId}`);
   const params: UpdateItemInput = {
     TableName: <string>process.env.TABLE_NAME,
     Key: {
@@ -39,6 +40,7 @@ export const handler = async (event: ConfirmFlightEvent) => {
       ':booked': { S: 'confirmed' }
     }
   };
+  console.log("Params used", params);
 
   // Call DynamoDB to add the item to the table
   const result = await dynamoDB

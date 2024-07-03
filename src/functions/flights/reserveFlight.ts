@@ -26,7 +26,8 @@ export const handler = async (event: ReserveRentalEvent) => {
 
   // create AWS SDK clients
   const dynamoDB = new DynamoDB();
-  console.log("Getting ready to insert into dynamodb")
+
+  console.log(`Getting ready to insert item in dynamodb, tripId: ${flightReservationId}; requestId: ${requestId}`);
   const params: PutItemInput = {
     TableName: <string>process.env.TABLE_NAME || 'Flight',
     Item: {
@@ -41,7 +42,7 @@ export const handler = async (event: ReserveRentalEvent) => {
       'transaction_status': { S: 'pending' }
     }
   };
-  console.log("Params inserted", params);
+  console.log("Params used", params);
   const result = await dynamoDB
     .putItem(params)
     .promise()

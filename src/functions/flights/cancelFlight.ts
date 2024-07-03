@@ -23,6 +23,7 @@ export const handler = async (event: CancelFlightEvent) => {
 
   const dynamoDB = new DynamoDB();
 
+  console.log(`Getting ready to delete item in dynamodb, tripId: ${flightReservationId}; requestId: ${requestId}`);
   const params: DeleteItemInput = {
     TableName: <string>process.env.TABLE_NAME,
     Key: {
@@ -30,6 +31,7 @@ export const handler = async (event: CancelFlightEvent) => {
       'sk': { S: flightReservationId }
     }
   };
+  console.log("Params used", params);
 
   const result = await dynamoDB
     .deleteItem(params)
