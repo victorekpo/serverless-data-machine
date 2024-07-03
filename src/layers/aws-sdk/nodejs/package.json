@@ -1,5 +1,5 @@
 {
-  "name": "uuid",
+  "name": "aws-sdk",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,6 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "uuid": "^10.0.0"
+    "aws-sdk": "^2.1653.0"
   }
 }

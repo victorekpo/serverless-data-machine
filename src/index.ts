@@ -10,13 +10,21 @@ export class CdkServerlessSagaStack extends CDK.Stack {
     console.log('New StateMachine');
 
     // Layers
+    const awsSdkLayer = new Lambda.LayerVersion(this, 'AWSdkLayer', {
+      code: Lambda.Code.fromAsset('src/layers/aws-sdk'),
+      compatibleRuntimes: [Lambda.Runtime.NODEJS_20_X],
+      description: 'A layer for aws-sdk library',
+    });
+
     const uuidLayer = new Lambda.LayerVersion(this, 'UuidLayer', {
       code: Lambda.Code.fromAsset('src/layers/uuid'),
       compatibleRuntimes: [Lambda.Runtime.NODEJS_20_X],
       description: 'A layer for uuid library',
     });
 
+
     const layers = [
+      awsSdkLayer,
       uuidLayer
     ];
 
