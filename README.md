@@ -28,3 +28,13 @@ https://docs.aws.amazon.com/prescriptive-guidance/latest/patterns/implement-the-
 
 https://podrezo.medium.com/quick-intro-to-aws-step-functions-using-serverless-framework-4d553f81cc9b
 
+Other Examples of Step Functions
+https://github.com/aws-samples/step-functions-workflows-collection/tree/main/word-filtering-script-generator-cdk/typescript
+
+https://github.com/aws-samples/step-functions-workflows-collection/tree/main/word-filtering-script-generator-cdk/typescript
+
+https://github.com/aws-samples/step-functions-workflows-collection/tree/main/moderated-image-catalog-cdk/typescript
+
+https://github.com/aws-samples/step-functions-workflows-collection/tree/main/chain-of-responsibility-cdk/typscript
+
+https://github.com/aws-samples/step-functions-workflows-collection/tree/main/moderated-image-catalog-cdk/typescript
