@@ -1,11 +1,11 @@
 ## Saga Pattern Step Functions to Book Reservations
 
 # Example Execution: 
- -https://9rlcqk5sv7.execute-api.us-east-1.amazonaws.com/prod/?departCity=NewYork&departTime=2024-07-04T10:00:00&arriveCity=LosAngeles&arriveTime=2024-07-04T13:00:00&rental=Yes&rentalFrom=2024-07-04&rentalTo=2024-07-10&requestId=12345
+ -<api-gateway-link>/prod/?departCity=NewYork&departTime=2024-07-04T10:00:00&arriveCity=LosAngeles&arriveTime=2024-07-04T13:00:00&rental=Yes&rentalFrom=2024-07-04&rentalTo=2024-07-10&requestId=12345
 
 ## Resources
 - https://construct-hub-testing.dev-tools.aws.dev/packages/aws-cdk-lib/v/2.123.0?lang=typescript&submodule=aws_lambda_nodejs
-- Original reference: https://github.com/aws-samples/step-functions-workflows-collection/tree/main/saga-pattern-cdk
+- https://github.com/aws-samples/step-functions-workflows-collection/tree/main/saga-pattern-cdk
 - https://upstash.com/docs/redis/tutorials/api_with_cdk
 - https://medium.com/@fameux/deploying-a-node-js-serverless-application-to-aws-with-aws-cdk-9767681362a2
 - https://docs.aws.amazon.com/cdk/v2/guide/serverless_example.html
