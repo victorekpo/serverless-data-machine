@@ -16,13 +16,12 @@ export const handler = async (event: ReserveRentalEvent) => {
 
   console.log(`Reserving rentals request: ${JSON.stringify(event, null, 2)}`, process.env.TABLE_NAME);
 
-  const flightReservationId = v4();
-  console.log(`flightReservationId: ${flightReservationId}`);
-
-  // Pass the parameter to fail this step
   if (runType === 'failFlightsReservation') {
     throw new Error('Failed to book the flights');
   }
+
+  const flightReservationId = v4();
+  console.log(`flightReservationId: ${flightReservationId}`);
 
   // create AWS SDK clients
   const dynamoDB = new DynamoDB();
