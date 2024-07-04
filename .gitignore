@@ -5,3 +5,4 @@ local.js
 .idea/
 package-lock.json
 cdk.out/
+.aws-sam/

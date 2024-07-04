@@ -30,12 +30,13 @@ export class StateMachine extends Construct {
     } = notifications;
 
     // Create Reservation Step Function Tasks
-    const { reserveFlight, reserveCarRental, processPayment, confirmFlight, confirmCarRental } = createReservationTasks(this, notifications, layers);
+    const { reserveFlight, reserveCarRental, sendEmailNotification, processPayment, confirmFlight, confirmCarRental } = createReservationTasks(this, notifications, layers);
 
     // Step Function definition, chain Tasks
     const stepFunctionDefinition = Sfn.Chain
       .start(reserveFlight)
       .next(reserveCarRental)
+      .next(sendEmailNotification)
       .next(processPayment)
       .next(confirmFlight)
       .next(confirmCarRental)

@@ -1,11 +1,12 @@
 import { Construct } from 'constructs';
+import * as Sfn from 'aws-cdk-lib/aws-stepfunctions';
 import * as Tasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
 import { createLambda, createLambdaFunctions } from './lambda';
 import { createDynamoDBTables } from './dynamodb';
 import { LayerVersion } from "aws-cdk-lib/aws-lambda";
 
 export const createReservationTasks = (scope: Construct, notifications: any, layers: LayerVersion[]) => {
-  const { reservationFailed, snsNotificationFailure } = notifications;
+  const { reservationFailed, snsNotificationFailure, topic } = notifications;
 
   // Create DynamoDB Tables
   const tables = createDynamoDBTables(scope);
@@ -68,6 +69,24 @@ export const createReservationTasks = (scope: Construct, notifications: any, lay
     });
 
   /**
+   * Confirm Reservations before Payment
+   */
+  console.log("TOPIC", topic);
+  const sendEmailNotification = new Tasks.SnsPublish(scope, 'SendEmailNotification', {
+    topic,
+    message: Sfn.TaskInput.fromObject({
+      default: 'Please confirm your car rental reservation by clicking the link below.',
+      email: {
+        subject: 'Confirm Your Reservation',
+        message: `Please confirm your reservation by clicking the link below: https://<api-id>.execute-api.us-east-1.amazonaws.com/prod/?taskToken=$$.Task.Token`, // Include the taskToken in the URL
+      },
+      taskToken: Sfn.JsonPath.taskToken
+    }),
+    integrationPattern: Sfn.IntegrationPattern.WAIT_FOR_TASK_TOKEN,
+    resultPath: '$.taskToken',
+  });
+
+  /**
    * Payment
    */
 
@@ -109,6 +128,7 @@ export const createReservationTasks = (scope: Construct, notifications: any, lay
   return {
     reserveFlight,
     reserveCarRental,
+    sendEmailNotification,
     processPayment,
     confirmFlight,
     confirmCarRental
