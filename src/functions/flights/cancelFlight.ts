@@ -2,12 +2,12 @@ import { DynamoDB } from 'aws-sdk';
 import { DeleteItemInput } from 'aws-sdk/clients/dynamodb';
 
 interface CancelFlightEvent {
-  requestId: string;
   ReserveFlightResult: {
     Payload: {
       flightReservationId: string;
     }
   }
+  requestId: string;
 }
 
 export const handler = async (event: CancelFlightEvent) => {
@@ -23,7 +23,7 @@ export const handler = async (event: CancelFlightEvent) => {
 
   const dynamoDB = new DynamoDB();
 
-  console.log(`Getting ready to delete item in dynamodb, tripId: ${flightReservationId}; requestId: ${requestId}`);
+  console.log(`Getting ready to delete item in dynamodb, flightReservation: ${flightReservationId}; requestId: ${requestId}`);
   const params: DeleteItemInput = {
     TableName: <string>process.env.TABLE_NAME || 'Flights',
     Key: {
