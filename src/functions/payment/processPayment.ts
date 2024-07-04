@@ -1,5 +1,6 @@
 import { DynamoDB } from 'aws-sdk';
 import { v4 } from "uuid";
+import { PutItemInput } from "aws-sdk/clients/dynamodb";
 interface ProcessPaymentEvent {
   ReserveFlightResult: {
     Payload: {
@@ -35,7 +36,7 @@ export const handler = async (event: ProcessPaymentEvent) => {
 
   const dynamoDB = new DynamoDB();
 
-  const params = {
+  const params: PutItemInput = {
     TableName: process.env.TABLE_NAME || 'Payments',
     Item: {
       'pk': { S: requestId },
@@ -60,5 +61,5 @@ export const handler = async (event: ProcessPaymentEvent) => {
   return {
     status: 'ok',
     paymentId
-  } ;
+  };
 };

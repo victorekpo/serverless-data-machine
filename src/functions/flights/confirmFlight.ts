@@ -2,13 +2,13 @@ import { DynamoDB } from 'aws-sdk';
 import { UpdateItemInput } from 'aws-sdk/clients/dynamodb';
 
 interface ConfirmFlightEvent {
-  runType: string;
   ReserveFlightResult: {
     Payload: {
       flightReservationId: string;
     }
   }
   requestId: string;
+  runType: string;
 }
 
 export const handler = async (event: ConfirmFlightEvent) => {
@@ -28,7 +28,7 @@ export const handler = async (event: ConfirmFlightEvent) => {
 
   const dynamoDB = new DynamoDB();
 
-  console.log(`Getting ready to update item in dynamodb, tripId: ${flightReservationId}; requestId: ${requestId}`);
+  console.log(`Getting ready to update item in dynamodb, flightReservation: ${flightReservationId}; requestId: ${requestId}`);
   const params: UpdateItemInput = {
     TableName: <string>process.env.TABLE_NAME || 'Flights',
     Key: {

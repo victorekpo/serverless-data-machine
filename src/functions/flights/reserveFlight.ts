@@ -3,11 +3,11 @@ import { DynamoDB } from 'aws-sdk';
 import { PutItemInput } from 'aws-sdk/clients/dynamodb';
 
 interface ReserveRentalEvent {
-  requestId: string;
   departCity: string;
   departTime: string;
   arriveCity: string;
   arriveTime: string;
+  requestId: string;
   runType: string;
 }
 
@@ -26,7 +26,7 @@ export const handler = async (event: ReserveRentalEvent) => {
   // create AWS SDK clients
   const dynamoDB = new DynamoDB();
 
-  console.log(`Getting ready to insert item in dynamodb, tripId: ${flightReservationId}; requestId: ${requestId}`);
+  console.log(`Getting ready to insert item in dynamodb, flightReservation: ${flightReservationId}; requestId: ${requestId}`);
   const params: PutItemInput = {
     TableName: <string>process.env.TABLE_NAME || 'Flights',
     Item: {
