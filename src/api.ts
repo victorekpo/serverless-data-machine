@@ -5,7 +5,7 @@ import { IFunction } from 'aws-cdk-lib/aws-lambda';
 
 export const linkApi = (scope: Construct, api: RestApi, handler: IFunction) => {
   // Create a new resource
-  const resource = api.root.addResource('your-resource');
+  const resource = api.root.addResource('saga-api-proxy');
 
   // For POST, PUT, DELETE Requests
   const requestModel = new Apigw.Model(scope, 'RequestModel', {

@@ -15,7 +15,7 @@ describe('CDK Stack', () => {
   test('API Gateway Proxy Created', () => {
     console.log('Testing API Gateway');
     template.hasResourceProperties('AWS::ApiGateway::Resource', {
-      'PathPart': '{proxy+}'
+      'PathPart': 'saga-api-proxy'
     });
   });
 

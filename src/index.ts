@@ -40,7 +40,7 @@ export class SagaStack extends CDK.Stack {
     /**
      * State Machine with Step Function Saga Pattern Tasks (Request, Compensation Fns)
      */
-    console.log('New StateMachine', stateMachine);
+    // console.log('New StateMachine', stateMachine);
   }
 }
 
