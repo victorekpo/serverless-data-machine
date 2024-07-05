@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#npm run synth
+npm run synth
 
 ## sam.cmd for windows regular sam for linux/mac
 sam.cmd build \

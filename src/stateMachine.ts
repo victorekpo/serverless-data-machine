@@ -36,7 +36,7 @@ export class StateMachine extends Construct {
     const stepFunctionDefinition = Sfn.Chain
       .start(reserveFlight)
       .next(reserveCarRental)
-      .next(sendEmailNotification)
+      // .next(sendEmailNotification)
       .next(processPayment)
       .next(confirmFlight)
       .next(confirmCarRental)

@@ -2,6 +2,7 @@
 
 ## Example Execution: 
  `-<api-gateway-link>/prod/?departCity=NewYork&departTime=2024-07-04T10:00:00&arriveCity=LosAngeles&arriveTime=2024-07-04T13:00:00&rental=Yes&rentalFrom=2024-07-04&rentalTo=2024-07-10&requestId=12345`
+`http://127.0.0.1:3000?departCity=NewYork&departTime=2024-07-04T10:00:00&arriveCity=LosAngeles&arriveTime=2024-07-04T13:00:00&rental=Yes&rentalFrom=2024-07-04&rentalTo=2024-07-10&requestId=12345`
 
 ## Resources
 - https://construct-hub-testing.dev-tools.aws.dev/packages/aws-cdk-lib/v/2.123.0?lang=typescript&submodule=aws_lambda_nodejs

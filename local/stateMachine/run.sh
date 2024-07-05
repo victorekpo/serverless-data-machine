@@ -2,7 +2,8 @@
 
 npm run synth
 
-# sam.cmd for windows regular sam for linux/mac
-sam.cmd local step-functions invoke MyStateMachine \
-  -t ../../cdk.out/CdkServerlessSagaStack.template.json \
-  --event ./event.json
+# state machines require arn in aws to execute
+aws stepfunctions start-execution \
+  --endpoint http://localhost:8083 \
+  --state-machine arn:aws:states:us-east-1:123456789012:stateMachine:HelloWorld \
+  --name test
