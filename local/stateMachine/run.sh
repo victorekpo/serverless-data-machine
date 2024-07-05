@@ -1,7 +1,5 @@
 #!/bin/bash
-
-npm run synth
-
+# assuming state machine has deployed and arn is available
 # state machines require arn in aws to execute
 aws stepfunctions start-execution \
   --endpoint http://localhost:8083 \
