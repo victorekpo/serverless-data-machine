@@ -2,6 +2,7 @@ import * as CDK from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { StateMachine } from './stateMachine';
 import * as Lambda from "aws-cdk-lib/aws-lambda";
+import * as Apigw from 'aws-cdk-lib/aws-apigateway';
 
 export class SagaStack extends CDK.Stack {
   constructor(scope: Construct, id: string, props?: CDK.StackProps) {
@@ -26,15 +27,25 @@ export class SagaStack extends CDK.Stack {
       uuidLayer
     ];
 
-    // instantiate State Machine
-    console.log('New StateMachine');
-    new StateMachine(this, 'StateMachine', layers);
+    /**
+     * Simple API Gateway proxy integration
+     */
+    const api = new Apigw.RestApi(this, 'ServerlessSagaPattern', {
+      restApiName: 'Serverless Saga Pattern',
+      description: 'This service handles serverless saga pattern.',
+    });
+    console.log('New API', api);
+
+    const stateMachine = new StateMachine(this, 'StateMachine', api, layers);
+    /**
+     * State Machine with Step Function Saga Pattern Tasks (Request, Compensation Fns)
+     */
+    console.log('New StateMachine', stateMachine);
   }
 }
 
 const app = new CDK.App();
-console.log('New SagaStack');
-new SagaStack(app, 'SagaStack-Demo', {
+const stack = new SagaStack(app, 'SagaStack-Demo', {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
@@ -49,3 +60,4 @@ new SagaStack(app, 'SagaStack-Demo', {
 
   /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
 });
+console.log('New SagaStack', stack);
