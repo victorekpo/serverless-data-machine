@@ -19,9 +19,9 @@ describe('CDK Stack', () => {
     });
   });
 
-  test('9 Lambda Functions Created', () => {
+  test('10 Lambda Functions Created', () => {
     console.log('Testing Lambda Functions');
-    template.resourceCountIs('AWS::Lambda::Function', 9);
+    template.resourceCountIs('AWS::Lambda::Function', 10);
   });
 
 

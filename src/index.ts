@@ -60,4 +60,4 @@ const stack = new SagaStack(app, 'SagaStack-Demo', {
 
   /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
 });
-console.log('New SagaStack', stack);
+console.log('New SagaStack');

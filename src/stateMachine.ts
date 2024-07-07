@@ -4,7 +4,7 @@ import * as Lambda from 'aws-cdk-lib/aws-lambda';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { createNotifications } from './notify';
 import { createReservationTasks } from './reservationTasks';
-import { linkApi } from "./api";
+import { linkApprovalApi, linkSagaApi } from "./api";
 import { join } from 'path';
 import { LayerVersion } from "aws-cdk-lib/aws-lambda";
 import { RestApi } from 'aws-cdk-lib/aws-apigateway';
@@ -62,7 +62,7 @@ export class StateMachine extends Construct {
     saga.grantStartExecution(sagaLambda);
 
     // Link Saga to API
-    linkApi(scope, api, sagaLambda);
+    linkSagaApi(scope, api, sagaLambda);
 
     // End Constructor
   }

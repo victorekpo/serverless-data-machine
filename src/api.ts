@@ -3,7 +3,7 @@ import * as Apigw from 'aws-cdk-lib/aws-apigateway';
 import { RestApi } from "aws-cdk-lib/aws-apigateway";
 import { IFunction } from 'aws-cdk-lib/aws-lambda';
 
-export const linkApi = (scope: Construct, api: RestApi, handler: IFunction) => {
+export const linkSagaApi = (scope: Construct, api: RestApi, handler: IFunction) => {
   // Create a new resource
   const resource = api.root.addResource('{proxy+}');
 
@@ -41,4 +41,8 @@ export const linkApi = (scope: Construct, api: RestApi, handler: IFunction) => {
       }
     }]
   });
+}
+
+export const linkApprovalApi = (scope: Construct, api: RestApi, handler: IFunction) => {
+
 }

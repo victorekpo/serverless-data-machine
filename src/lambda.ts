@@ -27,7 +27,7 @@ export const createLambdaFunctions = (scope: Construct, createFn: any, tables: R
   const cancelRentalLambda = createFnWithLayers({ scope, id: 'cancelRentalLambdaHandler', handler: 'rentals/cancelRental.ts', tables: [rentalTable] });
 
 // Confirm Reservation
-  const confirmReservationLambda = createFnWithLayers({ scope, id: 'approveReservationLambdaHandler', handler: 'confirm/confirmReservation.ts', environment: { TOPIC_ARN: topicArn} });
+  const confirmReservationLambda = createFnWithLayers({ scope, id: 'confirmReservationLambdaHandler', handler: 'confirm/confirmReservation.ts', environment: { TOPIC_ARN: topicArn} });
 
 // Payment
   const processPaymentLambda = createFnWithLayers({ scope, id: 'processPaymentLambdaHandler', handler: 'payment/processPayment.ts', tables: [paymentTable] });
