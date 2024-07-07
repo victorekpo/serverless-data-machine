@@ -2,6 +2,7 @@ import { SNS } from 'aws-sdk';
 
 exports.handler = async (event: any) => {
   console.log("EVENT", event);
+  console.log("ENV", process.env);
   const taskToken = event.taskToken;
   const approvalUrl = `https://${process.env.API_GATEWAY_URL}/approve?taskToken=${taskToken}`;
 

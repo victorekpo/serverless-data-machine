@@ -73,14 +73,13 @@ export const createLambda = ({ scope, id, handler, environment, tables, layers }
   tables: Table[] | null;
   layers?: LayerVersion[] | undefined;
 }) => {
+  console.log("CREATING ENV", environment);
   const fn = new NodejsFunction(scope, id, {
     runtime: Lambda.Runtime.NODEJS_20_X,
     entry: join('src', 'functions', handler),
-    bundling: {
-      environment: {
-        ...environment,
-        TABLE_NAME: tables?.length ? tables[0]?.tableName : 'none'
-      }
+    environment: {
+      ...environment,
+      TABLE_NAME: tables?.length ? tables[0]?.tableName : 'none'
     },
     ...(layers && { layers })
   });
