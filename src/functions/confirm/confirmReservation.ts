@@ -1,25 +1,22 @@
-import { StepFunctions } from 'aws-sdk';
-const Sfn = new StepFunctions();
+import { SNS } from 'aws-sdk';
 
 exports.handler = async (event: any) => {
-  console.log("EVENT", JSON.stringify(event, null, 2));
-  const taskToken = event.queryStringParameters.taskToken;
+  console.log("EVENT", event);
+  const taskToken = event.taskToken;
+  const approvalUrl = `https://${process.env.API_GATEWAY_URL}/approve?taskToken=${taskToken}`;
 
-  const params = {
-    taskToken: taskToken,
-    output: JSON.stringify({ status: 'approved' })
+  const message = {
+    Subject: 'Approval Request',
+    Message: `Please approve the task by clicking the following link: ${approvalUrl}`,
+    TopicArn: process.env.TOPIC_ARN
   };
 
+  const sns = new SNS();
+
   try {
-    await Sfn.sendTaskSuccess(params).promise();
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ message: 'Task approved successfully' })
-    };
-  } catch (error: any) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ message: 'Failed to approve task', error: error.message })
-    };
+    await sns.publish(message).promise();
+    console.log('Approval email sent successfully');
+  } catch (error) {
+    console.error('Error sending approval email:', error);
   }
 };

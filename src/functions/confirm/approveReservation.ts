@@ -1,5 +1,4 @@
 import { StepFunctions } from 'aws-sdk';
-const Sfn = new StepFunctions();
 
 exports.handler = async (event: any) => {
   console.log("EVENT", JSON.stringify(event, null, 2));
@@ -9,6 +8,8 @@ exports.handler = async (event: any) => {
     taskToken: taskToken,
     output: JSON.stringify({ status: 'approved' })
   };
+
+  const Sfn = new StepFunctions();
 
   try {
     await Sfn.sendTaskSuccess(params).promise();
