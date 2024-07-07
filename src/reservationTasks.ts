@@ -5,7 +5,7 @@ import { createLambda, createLambdaFunctions } from './lambda';
 import { createDynamoDBTables } from './dynamodb';
 import { LayerVersion } from "aws-cdk-lib/aws-lambda";
 
-export const createReservationTasks = (scope: Construct, notifications: any, apiUrl: string, layers: LayerVersion[]) => {
+export const createReservationTasks = (scope: Construct, notifications: any, layers: LayerVersion[]) => {
   const { reservationFailed, snsNotificationFailure, topic } = notifications;
 
   // Create DynamoDB Tables
@@ -30,7 +30,7 @@ export const createReservationTasks = (scope: Construct, notifications: any, api
       processPaymentLambda,
       refundPaymentLambda
     }
-  } = createLambdaFunctions(scope, createLambda, tables, topic, apiUrl, layers);
+  } = createLambdaFunctions(scope, createLambda, tables, topic, layers);
 
   /**
    * Reserve Flights

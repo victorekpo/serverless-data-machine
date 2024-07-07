@@ -9,7 +9,7 @@ import { join } from 'path';
  * Create Lambda Functions for booking and cancellation of services.
  */
 
-export const createLambdaFunctions = (scope: Construct, createFn: any, tables: Record<string, Table>, topic: Topic, apiUrl: string, layers: LayerVersion[]) => {
+export const createLambdaFunctions = (scope: Construct, createFn: any, tables: Record<string, Table>, topic: Topic, layers: LayerVersion[]) => {
   const { flightTable, rentalTable, paymentTable } = tables;
 
   const createFnWithLayers = (args: Record<string, any>) => {
@@ -27,7 +27,7 @@ export const createLambdaFunctions = (scope: Construct, createFn: any, tables: R
   const cancelRentalLambda = createFnWithLayers({ scope, id: 'cancelRentalLambdaHandler', handler: 'rentals/cancelRental.ts', tables: [rentalTable] });
 
   // Confirm Reservation
-  const confirmReservationLambda = createFnWithLayers({ scope, id: 'confirmReservationLambdaHandler', handler: 'confirm/confirmReservation.ts', environment: { API_URL: apiUrl,TOPIC_ARN: topic.topicArn } });
+  const confirmReservationLambda = createFnWithLayers({ scope, id: 'confirmReservationLambdaHandler', handler: 'confirm/confirmReservation.ts', environment: { API_URL: 'proxyUrl',TOPIC_ARN: topic.topicArn } });
   // Grant the Lambda function permissions to publish to the SNS topic
   topic.grantPublish(confirmReservationLambda);
 
@@ -73,12 +73,11 @@ export const createLambda = ({ scope, id, handler, environment, tables, layers }
   tables: Table[] | null;
   layers?: LayerVersion[] | undefined;
 }) => {
-  console.log("CREATING ENV", environment);
   const fn = new NodejsFunction(scope, id, {
     runtime: Runtime.NODEJS_20_X,
     entry: join('src', 'functions', handler),
     environment: {
-      ...environment,
+      ...(environment && { ...environment }),
       TABLE_NAME: tables?.length ? tables[0]?.tableName : 'none'
     },
     ...(layers && { layers })
