@@ -5,7 +5,7 @@ import { createLambda, createLambdaFunctions } from './lambda';
 import { createDynamoDBTables } from './dynamodb';
 import { LayerVersion } from "aws-cdk-lib/aws-lambda";
 
-export const createReservationTasks = (scope: Construct, notifications: any, layers: LayerVersion[]) => {
+export const createReservationTasks = (scope: Construct, notifications: any, apiUrl: string, layers: LayerVersion[]) => {
   const { reservationFailed, snsNotificationFailure, topic } = notifications;
 
   // Create DynamoDB Tables
@@ -78,7 +78,7 @@ export const createReservationTasks = (scope: Construct, notifications: any, lay
       default: 'Please confirm your car rental reservation by clicking the link below.',
       email: {
         subject: 'Confirm Your Reservation',
-        message: `Please confirm your reservation by clicking the link below: https://<api-id>.execute-api.us-east-1.amazonaws.com/prod/?taskToken=$$.Task.Token`, // Include the taskToken in the URL
+        message: `Please confirm your reservation by clicking the link below: https://${apiUrl}.execute-api.us-east-1.amazonaws.com/prod/?taskToken=$$.Task.Token`, // Include the taskToken in the URL
       },
       taskToken: Sfn.JsonPath.taskToken
     }),
