@@ -1,13 +1,13 @@
 import { Construct } from 'constructs';
 import * as Sfn from 'aws-cdk-lib/aws-stepfunctions';
-import * as Lambda from 'aws-cdk-lib/aws-lambda';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { LayerVersion, Runtime } from "aws-cdk-lib/aws-lambda";
+import { RestApi } from 'aws-cdk-lib/aws-apigateway';
+import { PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { createNotifications } from './notify';
 import { createReservationTasks } from './reservationTasks';
 import { createApiModels, linkApprovalApi, linkSagaApi } from "./api";
 import { join } from 'path';
-import { LayerVersion } from "aws-cdk-lib/aws-lambda";
-import { RestApi } from 'aws-cdk-lib/aws-apigateway';
 
 /**
  * Saga Pattern StepFunction
@@ -27,8 +27,7 @@ export class StateMachine extends Construct {
 
     const {
       reservationSucceeded,
-      snsNotificationSuccess,
-      topic
+      snsNotificationSuccess
     } = notifications;
 
     // Create Reservation Step Function Tasks
@@ -51,7 +50,7 @@ export class StateMachine extends Construct {
 
     // AWS Lambda resource to connect to our API Gateway to kick off our step function
     const sagaLambda = new NodejsFunction(this, 'sagaLambdaHandler', {
-      runtime: Lambda.Runtime.NODEJS_20_X,
+      runtime: Runtime.NODEJS_20_X,
       entry: join('src', 'functions', 'sagaLambda.ts'),
       environment: {
         statemachine_arn: saga.stateMachineArn
@@ -69,9 +68,14 @@ export class StateMachine extends Construct {
 
     // AWS Lambda resource to approve requests and linked to API Gateway
     const approvalLambda = new NodejsFunction(this, 'approvalLambdaHandler', {
-      runtime: Lambda.Runtime.NODEJS_20_X,
+      runtime: Runtime.NODEJS_20_X,
       entry: join('src', 'functions', 'confirm', 'approveReservation.ts'),
     });
+
+    approvalLambda.addToRolePolicy(new PolicyStatement({
+      actions: ['states:SendTaskSuccess'],
+      resources: ['*'] // Can restrict this to specific state machines
+    }));
 
     // Link Approval Lambda to API
     linkApprovalApi(scope, api, approvalLambda, responseModel);

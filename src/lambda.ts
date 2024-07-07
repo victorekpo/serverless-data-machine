@@ -1,15 +1,15 @@
 import { Construct } from 'constructs';
 import { Table } from 'aws-cdk-lib/aws-dynamodb';
-import { LayerVersion } from "aws-cdk-lib/aws-lambda";
+import { LayerVersion, Runtime } from "aws-cdk-lib/aws-lambda";
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
-import * as Lambda from 'aws-cdk-lib/aws-lambda';
+import { Topic } from "aws-cdk-lib/aws-sns";
 import { join } from 'path';
 
 /**
  * Create Lambda Functions for booking and cancellation of services.
  */
 
-export const createLambdaFunctions = (scope: Construct, createFn: any, tables: Record<string, Table>, topic: any, layers: LayerVersion[]) => {
+export const createLambdaFunctions = (scope: Construct, createFn: any, tables: Record<string, Table>, topic: Topic, layers: LayerVersion[]) => {
   const { flightTable, rentalTable, paymentTable } = tables;
 
   const createFnWithLayers = (args: Record<string, any>) => {
@@ -27,7 +27,7 @@ export const createLambdaFunctions = (scope: Construct, createFn: any, tables: R
   const cancelRentalLambda = createFnWithLayers({ scope, id: 'cancelRentalLambdaHandler', handler: 'rentals/cancelRental.ts', tables: [rentalTable] });
 
   // Confirm Reservation
-  const confirmReservationLambda = createFnWithLayers({ scope, id: 'confirmReservationLambdaHandler', handler: 'confirm/confirmReservation.ts', environment: { TOPIC_ARN: topic.arn} });
+  const confirmReservationLambda = createFnWithLayers({ scope, id: 'confirmReservationLambdaHandler', handler: 'confirm/confirmReservation.ts', environment: { TOPIC_ARN: topic.topicArn } });
   // Grant the Lambda function permissions to publish to the SNS topic
   topic.grantPublish(confirmReservationLambda);
 
@@ -75,7 +75,7 @@ export const createLambda = ({ scope, id, handler, environment, tables, layers }
 }) => {
   console.log("CREATING ENV", environment);
   const fn = new NodejsFunction(scope, id, {
-    runtime: Lambda.Runtime.NODEJS_20_X,
+    runtime: Runtime.NODEJS_20_X,
     entry: join('src', 'functions', handler),
     environment: {
       ...environment,
