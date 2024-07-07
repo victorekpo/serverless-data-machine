@@ -6,12 +6,12 @@ exports.handler = async (event: any) => {
 
   const taskToken = event.taskToken;
 
-  const approvalUrl = `${process.env.API_URL}/approve?taskToken=${taskToken}`;
-  const encodedApprovalUrl = encodeURIComponent(approvalUrl);
+  const encodedToken = encodeURIComponent(taskToken);
+  const approvalUrl = `${process.env.API_URL}/approve?taskToken=${encodedToken}`;
 
   const message = {
     Subject: 'Approval Request',
-    Message: `Please approve the task by clicking the following link: ${encodedApprovalUrl}`,
+    Message: `Please approve the task by clicking the following link: ${approvalUrl}`,
     TopicArn: process.env.TOPIC_ARN
   };
 

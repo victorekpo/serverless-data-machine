@@ -17,8 +17,6 @@ import { join } from 'path';
  * 4) Confirm Flight and Car Rental Reservation
  */
 export class StateMachine extends Construct {
-  public Machine: Sfn.StateMachine;
-
   constructor(scope: Construct, id: string, api: RestApi, layers: LayerVersion[]) {
     super(scope, id);
 
