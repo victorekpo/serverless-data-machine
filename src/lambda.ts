@@ -9,7 +9,7 @@ import { join } from 'path';
  * Create Lambda Functions for booking and cancellation of services.
  */
 
-export const createLambdaFunctions = (scope: Construct, createFn: any, tables: Record<string, Table>, topic: Topic, layers: LayerVersion[]) => {
+export const createLambdaFunctions = (scope: Construct, createFn: any, tables: Record<string, Table>, topic: Topic, apiUrl: string, layers: LayerVersion[]) => {
   const { flightTable, rentalTable, paymentTable } = tables;
 
   const createFnWithLayers = (args: Record<string, any>) => {
@@ -27,7 +27,7 @@ export const createLambdaFunctions = (scope: Construct, createFn: any, tables: R
   const cancelRentalLambda = createFnWithLayers({ scope, id: 'cancelRentalLambdaHandler', handler: 'rentals/cancelRental.ts', tables: [rentalTable] });
 
   // Confirm Reservation
-  const confirmReservationLambda = createFnWithLayers({ scope, id: 'confirmReservationLambdaHandler', handler: 'confirm/confirmReservation.ts', environment: { TOPIC_ARN: topic.topicArn } });
+  const confirmReservationLambda = createFnWithLayers({ scope, id: 'confirmReservationLambdaHandler', handler: 'confirm/confirmReservation.ts', environment: { API_URL: apiUrl,TOPIC_ARN: topic.topicArn } });
   // Grant the Lambda function permissions to publish to the SNS topic
   topic.grantPublish(confirmReservationLambda);
 

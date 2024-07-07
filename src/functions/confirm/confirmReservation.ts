@@ -3,12 +3,15 @@ import { SNS } from 'aws-sdk';
 exports.handler = async (event: any) => {
   console.log("EVENT", event);
   console.log("ENV", process.env);
+
   const taskToken = event.taskToken;
-  const approvalUrl = `https://${process.env.API_GATEWAY_URL}/approve?taskToken=${taskToken}`;
+
+  const approvalUrl = `${process.env.API_URL}/approve?taskToken=${taskToken}`;
+  const encodedApprovalUrl = encodeURIComponent(approvalUrl);
 
   const message = {
     Subject: 'Approval Request',
-    Message: `Please approve the task by clicking the following link: ${approvalUrl}`,
+    Message: `Please approve the task by clicking the following link: ${encodedApprovalUrl}`,
     TopicArn: process.env.TOPIC_ARN
   };
 
