@@ -34,13 +34,13 @@ export class SagaStack extends CDK.Stack {
       restApiName: 'Serverless Saga Pattern',
       description: 'This service handles serverless saga pattern.',
     });
-    console.log('New API', api);
+    console.log('New API');
 
     const stateMachine = new StateMachine(this, 'StateMachine', api, layers);
     /**
      * State Machine with Step Function Saga Pattern Tasks (Request, Compensation Fns)
      */
-    // console.log('New StateMachine', stateMachine);
+    console.log('New StateMachine');
   }
 }
 

@@ -5,8 +5,10 @@ import { createLambda, createLambdaFunctions } from './lambda';
 import { createDynamoDBTables } from './dynamodb';
 import { LayerVersion } from "aws-cdk-lib/aws-lambda";
 
-export const createReservationTasks = (scope: Construct, notifications: any, apiUrl: string, layers: LayerVersion[]) => {
+export const createReservationTasks = (scope: Construct, notifications: any, layers: LayerVersion[]) => {
   const { reservationFailed, snsNotificationFailure, topic } = notifications;
+
+  const topicArn = topic.arn;
 
   // Create DynamoDB Tables
   const tables = createDynamoDBTables(scope);
@@ -23,11 +25,14 @@ export const createReservationTasks = (scope: Construct, notifications: any, api
       confirmRentalLambda,
       cancelRentalLambda
     },
+    confirm: {
+      confirmReservationLambda
+    },
     paymentFns: {
       processPaymentLambda,
       refundPaymentLambda
     }
-  } = createLambdaFunctions(scope, createLambda, tables, layers);
+  } = createLambdaFunctions(scope, createLambda, tables, topicArn, layers);
 
   /**
    * Reserve Flights
@@ -71,19 +76,13 @@ export const createReservationTasks = (scope: Construct, notifications: any, api
   /**
    * Confirm Reservations before Payment
    */
-  console.log("TOPIC", topic);
-  const sendEmailNotification = new Tasks.SnsPublish(scope, 'SendEmailNotification', {
-    topic,
-    message: Sfn.TaskInput.fromObject({
-      default: 'Please confirm your car rental reservation by clicking the link below.',
-      email: {
-        subject: 'Confirm Your Reservation',
-        message: `Please confirm your reservation by clicking the link below: https://${apiUrl}.execute-api.us-east-1.amazonaws.com/prod/?taskToken=$$.Task.Token`, // Include the taskToken in the URL
-      },
-      taskToken: Sfn.JsonPath.taskToken
+  const confirmReservation = new Tasks.LambdaInvoke(scope, 'ConfirmReservation', {
+    lambdaFunction: confirmReservationLambda,
+    payload: Sfn.TaskInput.fromObject({
+      taskToken: Sfn.JsonPath.taskToken,
     }),
     integrationPattern: Sfn.IntegrationPattern.WAIT_FOR_TASK_TOKEN,
-    resultPath: '$.taskToken',
+    resultPath: '$.taskToken'
   });
 
   /**
@@ -128,7 +127,7 @@ export const createReservationTasks = (scope: Construct, notifications: any, api
   return {
     reserveFlight,
     reserveCarRental,
-    sendEmailNotification,
+    confirmReservation,
     processPayment,
     confirmFlight,
     confirmCarRental

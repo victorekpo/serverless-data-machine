@@ -22,26 +22,23 @@ export class StateMachine extends Construct {
   constructor(scope: Construct, id: string, api: RestApi, layers: LayerVersion[]) {
     super(scope, id);
 
-    // API URL
-    const apiUrl = api.url;
-    console.log("API URL", apiUrl);
-
     // Final States - Success or Failure, SNS Topic, and SNS Notifications
     const notifications = createNotifications(this);
 
     const {
       reservationSucceeded,
-      snsNotificationSuccess
+      snsNotificationSuccess,
+      topic
     } = notifications;
 
     // Create Reservation Step Function Tasks
-    const { reserveFlight, reserveCarRental, sendEmailNotification, processPayment, confirmFlight, confirmCarRental } = createReservationTasks(this, notifications, apiUrl, layers);
+    const { reserveFlight, reserveCarRental, confirmReservation, processPayment, confirmFlight, confirmCarRental } = createReservationTasks(this, notifications, layers);
 
     // Step Function definition, chain Tasks
     const stepFunctionDefinition = Sfn.Chain
       .start(reserveFlight)
       .next(reserveCarRental)
-      // .next(sendEmailNotification)
+      .next(confirmReservation)
       .next(processPayment)
       .next(confirmFlight)
       .next(confirmCarRental)
