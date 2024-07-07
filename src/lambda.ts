@@ -9,7 +9,7 @@ import { join } from 'path';
  * Create Lambda Functions for booking and cancellation of services.
  */
 
-export const createLambdaFunctions = (scope: Construct, createFn: any, tables: Record<string, Table>, topicArn: string, layers: LayerVersion[]) => {
+export const createLambdaFunctions = (scope: Construct, createFn: any, tables: Record<string, Table>, topic: any, layers: LayerVersion[]) => {
   const { flightTable, rentalTable, paymentTable } = tables;
 
   const createFnWithLayers = (args: Record<string, any>) => {
@@ -21,15 +21,17 @@ export const createLambdaFunctions = (scope: Construct, createFn: any, tables: R
   const confirmFlightLambda = createFnWithLayers({ scope, id: 'confirmFlightLambdaHandler', handler: 'flights/confirmFlight.ts', tables: [flightTable] });
   const cancelFlightLambda = createFnWithLayers({ scope, id: 'cancelFlightLambdaHandler', handler: 'flights/cancelFlight.ts', tables: [flightTable] });
 
-// Car Rentals
+  // Car Rentals
   const reserveRentalLambda = createFnWithLayers({ scope, id: 'reserveRentalLambdaHandler', handler: 'rentals/reserveRental.ts', tables: [rentalTable] });
   const confirmRentalLambda = createFnWithLayers({ scope, id: 'confirmRentalLambdaHandler', handler: 'rentals/confirmRental.ts', tables: [rentalTable] });
   const cancelRentalLambda = createFnWithLayers({ scope, id: 'cancelRentalLambdaHandler', handler: 'rentals/cancelRental.ts', tables: [rentalTable] });
 
-// Confirm Reservation
-  const confirmReservationLambda = createFnWithLayers({ scope, id: 'confirmReservationLambdaHandler', handler: 'confirm/confirmReservation.ts', environment: { TOPIC_ARN: topicArn} });
+  // Confirm Reservation
+  const confirmReservationLambda = createFnWithLayers({ scope, id: 'confirmReservationLambdaHandler', handler: 'confirm/confirmReservation.ts', environment: { TOPIC_ARN: topic.arn} });
+  // Grant the Lambda function permissions to publish to the SNS topic
+  topic.grantPublish(confirmReservationLambda);
 
-// Payment
+  // Payment
   const processPaymentLambda = createFnWithLayers({ scope, id: 'processPaymentLambdaHandler', handler: 'payment/processPayment.ts', tables: [paymentTable] });
   const refundPaymentLambda = createFnWithLayers({ scope, id: 'refundPaymentLambdaHandler', handler: 'payment/refundPayment.ts', tables: [paymentTable] });
 

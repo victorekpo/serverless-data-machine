@@ -15,13 +15,16 @@ describe('CDK Stack', () => {
   test('API Gateway Proxy Created', () => {
     console.log('Testing API Gateway');
     template.hasResourceProperties('AWS::ApiGateway::Resource', {
-      'PathPart': '{proxy+}'
+      'PathPart': 'start', // use proxy for catch all '{proxy+}'
+    });
+    template.hasResourceProperties('AWS::ApiGateway::Resource', {
+      'PathPart': 'approve',
     });
   });
 
-  test('10 Lambda Functions Created', () => {
+  test('11 Lambda Functions Created', () => {
     console.log('Testing Lambda Functions');
-    template.resourceCountIs('AWS::Lambda::Function', 10);
+    template.resourceCountIs('AWS::Lambda::Function', 11);
   });
 
 

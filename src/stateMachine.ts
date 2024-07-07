@@ -4,7 +4,7 @@ import * as Lambda from 'aws-cdk-lib/aws-lambda';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { createNotifications } from './notify';
 import { createReservationTasks } from './reservationTasks';
-import { linkApprovalApi, linkSagaApi } from "./api";
+import { createApiModels, linkApprovalApi, linkSagaApi } from "./api";
 import { join } from 'path';
 import { LayerVersion } from "aws-cdk-lib/aws-lambda";
 import { RestApi } from 'aws-cdk-lib/aws-apigateway';
@@ -61,9 +61,20 @@ export class StateMachine extends Construct {
 
     saga.grantStartExecution(sagaLambda);
 
-    // Link Saga to API
-    linkSagaApi(scope, api, sagaLambda);
+    // Create Api Models (request, response)
+    const { responseModel } = createApiModels(scope, api);
 
+    // Link Saga to API
+    linkSagaApi(scope, api, sagaLambda, responseModel);
+
+    // AWS Lambda resource to approve requests and linked to API Gateway
+    const approvalLambda = new NodejsFunction(this, 'approvalLambdaHandler', {
+      runtime: Lambda.Runtime.NODEJS_20_X,
+      entry: join('src', 'functions', 'confirm', 'approveReservation.ts'),
+    });
+
+    // Link Approval Lambda to API
+    linkApprovalApi(scope, api, approvalLambda, responseModel);
     // End Constructor
   }
 }

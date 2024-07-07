@@ -3,10 +3,7 @@ import * as Apigw from 'aws-cdk-lib/aws-apigateway';
 import { RestApi } from "aws-cdk-lib/aws-apigateway";
 import { IFunction } from 'aws-cdk-lib/aws-lambda';
 
-export const linkSagaApi = (scope: Construct, api: RestApi, handler: IFunction) => {
-  // Create a new resource
-  const resource = api.root.addResource('{proxy+}');
-
+export const createApiModels = (scope: Construct, api: RestApi) => {
   // For POST, PUT, DELETE Requests
   const requestModel = new Apigw.Model(scope, 'RequestModel', {
     restApi: api,
@@ -31,8 +28,17 @@ export const linkSagaApi = (scope: Construct, api: RestApi, handler: IFunction) 
     }
   });
 
+  return {
+    requestModel,
+    responseModel
+  };
+};
 
-// Add a GET method to the resource with lambda integration to the handler function
+export const linkSagaApi = (scope: Construct, api: RestApi, handler: IFunction, responseModel: any) => {
+  // Create a new resource (API path)
+  const resource = api.root.addResource('start');
+
+  // Add a GET method to the resource with lambda integration to the handler function
   resource.addMethod('GET', new Apigw.LambdaIntegration(handler), {
     methodResponses: [{
       statusCode: '200',
@@ -41,8 +47,18 @@ export const linkSagaApi = (scope: Construct, api: RestApi, handler: IFunction) 
       }
     }]
   });
-}
+};
 
-export const linkApprovalApi = (scope: Construct, api: RestApi, handler: IFunction) => {
+export const linkApprovalApi = (scope: Construct, api: RestApi, handler: IFunction, responseModel: any) => {
+  const resource = api.root.addResource('approve');
 
-}
+  // Add a GET method to the resource with lambda integration to the handler function
+  resource.addMethod('GET', new Apigw.LambdaIntegration(handler), {
+    methodResponses: [{
+      statusCode: '200',
+      responseModels: {
+        'application/json': responseModel
+      }
+    }]
+  });
+};
