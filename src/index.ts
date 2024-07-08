@@ -41,16 +41,19 @@ export class SagaStackAPI extends CDK.Stack {
     // Export the API Gateway URL
     new CDK.CfnOutput(this, 'ApiGatewayUrlOutput', {
       value: api.url,
+      exportName: 'ApiGatewayUrlOutput'
     });
 
     // Export the API Gateway RestApiId
     new CDK.CfnOutput(this, 'ApiGatewayRestApiIdOutput', {
       value: api.restApiId,
+      exportName: 'ApiGatewayRestApiIdOutput'
     });
 
     // Export the API Gateway RootResourceId
     new CDK.CfnOutput(this, 'ApiGatewayRootResourceIdOutput', {
       value: api.root.resourceId,
+      exportName: 'ApiGatewayRootResourceIdOutput'
     });
   }
 }
@@ -97,7 +100,7 @@ export class SagaStackStateMachine extends CDK.Stack {
 }
 
 const app = new CDK.App();
-new SagaStackAPI(app, 'SagaStack-API', {
+const apiStack = new SagaStackAPI(app, 'SagaStack-API', {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
@@ -114,7 +117,7 @@ new SagaStackAPI(app, 'SagaStack-API', {
 });
 console.log('New SagaStack-API');
 
-new SagaStackStateMachine(app, 'SagaStack-SM', {
+const stateMachineStack = new SagaStackStateMachine(app, 'SagaStack-SM', {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
@@ -130,3 +133,4 @@ new SagaStackStateMachine(app, 'SagaStack-SM', {
   /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
 });
 console.log('New SagaStack-SM');
+stateMachineStack.addDependency(apiStack);
