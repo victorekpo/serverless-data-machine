@@ -2,7 +2,7 @@ import { Construct } from 'constructs';
 import * as Sfn from 'aws-cdk-lib/aws-stepfunctions';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { LayerVersion, Runtime } from "aws-cdk-lib/aws-lambda";
-import { RestApi } from 'aws-cdk-lib/aws-apigateway';
+import { IRestApi } from 'aws-cdk-lib/aws-apigateway';
 import { PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { createNotifications } from './notify';
 import { createReservationTasks } from './reservationTasks';
@@ -17,7 +17,7 @@ import { join } from 'path';
  * 4) Confirm Flight and Car Rental Reservation
  */
 export class StateMachine extends Construct {
-  constructor(scope: Construct, id: string, api: RestApi, layers: LayerVersion[]) {
+  constructor(scope: Construct, id: string, api: IRestApi, layers: LayerVersion[]) {
     super(scope, id);
 
     // Final States - Success or Failure, SNS Topic, and SNS Notifications

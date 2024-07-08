@@ -1,9 +1,9 @@
 import { Construct } from "constructs";
 import * as Apigw from 'aws-cdk-lib/aws-apigateway';
-import { RestApi } from "aws-cdk-lib/aws-apigateway";
+import { IRestApi } from "aws-cdk-lib/aws-apigateway";
 import { IFunction } from 'aws-cdk-lib/aws-lambda';
 
-export const createApiModels = (scope: Construct, api: RestApi) => {
+export const createApiModels = (scope: Construct, api: IRestApi) => {
   // For POST, PUT, DELETE Requests
   const requestModel = new Apigw.Model(scope, 'RequestModel', {
     restApi: api,
@@ -34,7 +34,7 @@ export const createApiModels = (scope: Construct, api: RestApi) => {
   };
 };
 
-export const linkSagaApi = (scope: Construct, api: RestApi, handler: IFunction, responseModel: any) => {
+export const linkSagaApi = (scope: Construct, api: IRestApi, handler: IFunction, responseModel: any) => {
   // Create a new resource (API path)
   const resource = api.root.addResource('start');
 
@@ -49,7 +49,7 @@ export const linkSagaApi = (scope: Construct, api: RestApi, handler: IFunction, 
   });
 };
 
-export const linkApprovalApi = (scope: Construct, api: RestApi, handler: IFunction, responseModel: any) => {
+export const linkApprovalApi = (scope: Construct, api: IRestApi, handler: IFunction, responseModel: any) => {
   const resource = api.root.addResource('approve');
 
   // Add a GET method to the resource with lambda integration to the handler function

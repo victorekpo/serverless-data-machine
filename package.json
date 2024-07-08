@@ -9,8 +9,8 @@
   "scripts": {
     "build": "tsc",
     "bootstrap": "cdk bootstrap",
-    "deploy": "cdk deploy",
-    "destroy": "cdk destroy",
+    "deploy": "cdk deploy --all",
+    "destroy": "cdk destroy --all",
     "lint": "eslint **/*.ts",
     "lint-fix": "eslint **/*.ts --fix",
     "synth": "cdk synth",
