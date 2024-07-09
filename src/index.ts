@@ -94,7 +94,7 @@ export class SagaStackStateMachine extends CDK.Stack {
       rootResourceId: rootResourceId,
     });
 
-    new StateMachine(this, 'StateMachine', api, layers);
+    const stateMachine = new StateMachine(this, 'StateMachine', api, layers);
     /**
      * State Machine with Step Function Saga Pattern Tasks (Request, Compensation Fns)
      */
@@ -104,6 +104,8 @@ export class SagaStackStateMachine extends CDK.Stack {
     const deployment = new Apigw.Deployment(this, 'Deployment', {
       api,
     });
+
+    deployment.node.addDependency(stateMachine);
 
     console.log("Redeploying API with new methods");
     new Apigw.Stage(this, 'ProdStage', {
