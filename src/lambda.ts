@@ -1,34 +1,42 @@
 import { Construct } from 'constructs';
 import { Table } from 'aws-cdk-lib/aws-dynamodb';
-import { LayerVersion } from "aws-cdk-lib/aws-lambda";
+import { LayerVersion, Runtime } from "aws-cdk-lib/aws-lambda";
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
-import * as Lambda from 'aws-cdk-lib/aws-lambda';
+import { Topic } from "aws-cdk-lib/aws-sns";
+import { Fn } from "aws-cdk-lib";
 import { join } from 'path';
 
 /**
  * Create Lambda Functions for booking and cancellation of services.
  */
 
-export const createLambdaFunctions = (scope: Construct, createFn: any, tables: Record<string, Table>, layers: LayerVersion[]) => {
+export const createLambdaFunctions = (scope: Construct, createFn: any, tables: Record<string, Table>, topic: Topic, layers: LayerVersion[]) => {
   const { flightTable, rentalTable, paymentTable } = tables;
 
-  const createFnWithLayers = (...args: any[]) => {
-    return createFn(...args, layers);
+  const apiGatewayUrl = Fn.importValue('ApiGatewayUrlOutput');
+
+  const createFnWithLayers = (args: Record<string, any>) => {
+    return createFn({...args, layers });
   };
 
   // Flights
-  const reserveFlightLambda = createFnWithLayers(scope, 'reserveFlightLambdaHandler', 'flights/reserveFlight.ts', flightTable);
-  const confirmFlightLambda = createFnWithLayers(scope, 'confirmFlightLambdaHandler', 'flights/confirmFlight.ts', flightTable);
-  const cancelFlightLambda = createFnWithLayers(scope, 'cancelFlightLambdaHandler', 'flights/cancelFlight.ts', flightTable);
+  const reserveFlightLambda = createFnWithLayers({ scope, id: 'reserveFlightLambdaHandler', handler: 'flights/reserveFlight.ts', tables: [flightTable] });
+  const confirmFlightLambda = createFnWithLayers({ scope, id: 'confirmFlightLambdaHandler', handler: 'flights/confirmFlight.ts', tables: [flightTable] });
+  const cancelFlightLambda = createFnWithLayers({ scope, id: 'cancelFlightLambdaHandler', handler: 'flights/cancelFlight.ts', tables: [flightTable] });
 
-  //Car Rentals
-  const reserveRentalLambda = createFnWithLayers(scope, 'reserveRentalLambdaHandler', 'rentals/reserveRental.ts', rentalTable);
-  const confirmRentalLambda = createFnWithLayers(scope, 'confirmRentalLambdaHandler', 'rentals/confirmRental.ts', rentalTable);
-  const cancelRentalLambda = createFnWithLayers(scope, 'cancelRentalLambdaHandler', 'rentals/cancelRental.ts', rentalTable);
+  // Car Rentals
+  const reserveRentalLambda = createFnWithLayers({ scope, id: 'reserveRentalLambdaHandler', handler: 'rentals/reserveRental.ts', tables: [rentalTable] });
+  const confirmRentalLambda = createFnWithLayers({ scope, id: 'confirmRentalLambdaHandler', handler: 'rentals/confirmRental.ts', tables: [rentalTable] });
+  const cancelRentalLambda = createFnWithLayers({ scope, id: 'cancelRentalLambdaHandler', handler: 'rentals/cancelRental.ts', tables: [rentalTable] });
+
+  // Confirm Reservation
+  const confirmReservationLambda = createFnWithLayers({ scope, id: 'confirmReservationLambdaHandler', handler: 'confirm/confirmReservation.ts', environment: { API_URL: apiGatewayUrl,TOPIC_ARN: topic.topicArn } });
+  // Grant the Lambda function permissions to publish to the SNS topic
+  topic.grantPublish(confirmReservationLambda);
 
   // Payment
-  const processPaymentLambda = createFnWithLayers(scope, 'processPaymentLambdaHandler', 'payment/processPayment.ts', paymentTable);
-  const refundPaymentLambda = createFnWithLayers(scope, 'refundPaymentLambdaHandler', 'payment/refundPayment.ts', paymentTable);
+  const processPaymentLambda = createFnWithLayers({ scope, id: 'processPaymentLambdaHandler', handler: 'payment/processPayment.ts', tables: [paymentTable] });
+  const refundPaymentLambda = createFnWithLayers({ scope, id: 'refundPaymentLambdaHandler', handler: 'payment/refundPayment.ts', tables: [paymentTable] });
 
   return {
     flightFns: {
@@ -40,6 +48,9 @@ export const createLambdaFunctions = (scope: Construct, createFn: any, tables: R
       reserveRentalLambda,
       confirmRentalLambda,
       cancelRentalLambda
+    },
+    confirm: {
+      confirmReservationLambda
     },
     paymentFns: {
       processPaymentLambda,
@@ -57,21 +68,32 @@ export const createLambdaFunctions = (scope: Construct, createFn: any, tables: R
  * @param layers
  */
 
-export const createLambda = (scope: Construct, id: string, handler: string, table: Table, layers?: LayerVersion[] | undefined) => {
-  console.log("TableLambda: ", table.tableName)
+export const createLambda = ({ scope, id, handler, environment, tables, layers }: {
+  scope: Construct;
+  id: string;
+  handler: string;
+  environment: Record<string, any>,
+  tables: Table[] | null;
+  layers?: LayerVersion[] | undefined;
+}) => {
   const fn = new NodejsFunction(scope, id, {
-    runtime: Lambda.Runtime.NODEJS_20_X,
+    runtime: Runtime.NODEJS_20_X,
     entry: join('src', 'functions', handler),
-    bundling: {
-      environment: {
-        TABLE_NAME: table.tableName
-      }
+    environment: {
+      ...(environment && { ...environment }),
+      TABLE_NAME: tables?.length ? tables[0]?.tableName : 'none'
     },
     ...(layers && { layers })
   });
 
   // Give Lambda permissions to read and write data from the DynamoDB table
-  table.grantReadWriteData(fn);
+  if (tables) {
+    tables.forEach(table => {
+      if (table) {
+        table.grantReadWriteData(fn);
+      }
+    });
+  }
 
   return fn;
 };

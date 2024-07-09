@@ -23,11 +23,14 @@ export const createReservationTasks = (scope: Construct, notifications: any, lay
       confirmRentalLambda,
       cancelRentalLambda
     },
+    confirm: {
+      confirmReservationLambda
+    },
     paymentFns: {
       processPaymentLambda,
       refundPaymentLambda
     }
-  } = createLambdaFunctions(scope, createLambda, tables, layers);
+  } = createLambdaFunctions(scope, createLambda, tables, topic, layers);
 
   /**
    * Reserve Flights
@@ -71,19 +74,13 @@ export const createReservationTasks = (scope: Construct, notifications: any, lay
   /**
    * Confirm Reservations before Payment
    */
-  console.log("TOPIC", topic);
-  const sendEmailNotification = new Tasks.SnsPublish(scope, 'SendEmailNotification', {
-    topic,
-    message: Sfn.TaskInput.fromObject({
-      default: 'Please confirm your car rental reservation by clicking the link below.',
-      email: {
-        subject: 'Confirm Your Reservation',
-        message: `Please confirm your reservation by clicking the link below: https://<api-id>.execute-api.us-east-1.amazonaws.com/prod/?taskToken=$$.Task.Token`, // Include the taskToken in the URL
-      },
-      taskToken: Sfn.JsonPath.taskToken
+  const confirmReservation = new Tasks.LambdaInvoke(scope, 'ConfirmReservation', {
+    lambdaFunction: confirmReservationLambda,
+    payload: Sfn.TaskInput.fromObject({
+      taskToken: Sfn.JsonPath.taskToken,
     }),
     integrationPattern: Sfn.IntegrationPattern.WAIT_FOR_TASK_TOKEN,
-    resultPath: '$.taskToken',
+    resultPath: '$.taskToken'
   });
 
   /**
@@ -128,7 +125,7 @@ export const createReservationTasks = (scope: Construct, notifications: any, lay
   return {
     reserveFlight,
     reserveCarRental,
-    sendEmailNotification,
+    confirmReservation,
     processPayment,
     confirmFlight,
     confirmCarRental
