@@ -14,6 +14,9 @@ export class SagaStackAPI extends CDK.Stack {
     const api = new Apigw.RestApi(this, 'ServerlessSagaPattern', {
       restApiName: 'Serverless Saga Pattern',
       description: 'This service handles serverless saga pattern.',
+      deployOptions: {
+        stageName: 'test',  // Create the "test" stage initially
+      },
     });
     console.log('New API');
 
@@ -96,6 +99,17 @@ export class SagaStackStateMachine extends CDK.Stack {
      * State Machine with Step Function Saga Pattern Tasks (Request, Compensation Fns)
      */
     console.log('New StateMachine');
+
+    // Deploy the API Gateway stage
+    const deployment = new Apigw.Deployment(this, 'Deployment', {
+      api,
+    });
+
+    console.log("Redeploying API with new methods");
+    new Apigw.Stage(this, 'ProdStage', {
+      deployment,
+      stageName: 'prod',
+    });
   }
 }
 
