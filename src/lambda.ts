@@ -3,6 +3,7 @@ import { Table } from 'aws-cdk-lib/aws-dynamodb';
 import { LayerVersion, Runtime } from "aws-cdk-lib/aws-lambda";
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { Topic } from "aws-cdk-lib/aws-sns";
+import { Fn } from "aws-cdk-lib";
 import { join } from 'path';
 
 /**
@@ -11,6 +12,8 @@ import { join } from 'path';
 
 export const createLambdaFunctions = (scope: Construct, createFn: any, tables: Record<string, Table>, topic: Topic, layers: LayerVersion[]) => {
   const { flightTable, rentalTable, paymentTable } = tables;
+
+  const apiGatewayUrl = Fn.importValue('ApiGatewayUrlOutput');
 
   const createFnWithLayers = (args: Record<string, any>) => {
     return createFn({...args, layers });
@@ -27,7 +30,7 @@ export const createLambdaFunctions = (scope: Construct, createFn: any, tables: R
   const cancelRentalLambda = createFnWithLayers({ scope, id: 'cancelRentalLambdaHandler', handler: 'rentals/cancelRental.ts', tables: [rentalTable] });
 
   // Confirm Reservation
-  const confirmReservationLambda = createFnWithLayers({ scope, id: 'confirmReservationLambdaHandler', handler: 'confirm/confirmReservation.ts', environment: { API_URL: 'proxyUrl',TOPIC_ARN: topic.topicArn } });
+  const confirmReservationLambda = createFnWithLayers({ scope, id: 'confirmReservationLambdaHandler', handler: 'confirm/confirmReservation.ts', environment: { API_URL: apiGatewayUrl,TOPIC_ARN: topic.topicArn } });
   // Grant the Lambda function permissions to publish to the SNS topic
   topic.grantPublish(confirmReservationLambda);
 
