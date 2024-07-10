@@ -112,6 +112,13 @@ export class SagaStackStateMachine extends CDK.Stack {
       deployment,
       stageName: 'prod',
     });
+
+    const apiUrl = CDK.Fn.importValue('ApiGatewayUrlOutput');
+
+    // Output the imported API URL for confirmation or further use
+    new CDK.CfnOutput(this, 'ImportedApiUrl', {
+      value: apiUrl,
+    });
   }
 }
 
